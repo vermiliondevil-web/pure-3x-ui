@@ -981,12 +981,12 @@ tag_version=$(resolve_latest_tag)
 if [[ ! -n "$tag_version" ]]; then
 exit 1
 fi
-curl -fLR --retry 5 --retry-delay 3 --connect-timeout 15 --speed-limit 1 --speed-time 300 -o ${xui_folder}-linux-$(arch).tar.gz github.com{tag_version}/x-ui-linux-$(arch).tar.gz
+curl -fLR --retry 5 --retry-delay 3 --connect-timeout 15 --speed-limit 1 --speed-time 300 -o ${xui_folder}-linux-$(arch).tar.gz github.com${tag_version}/x-ui-linux-$(arch).tar.gz
 if [[ $? -ne 0 || ! -s ${xui_folder}-linux-$(arch).tar.gz ]]; then
 rm -f ${xui_folder}-linux-$(arch).tar.gz
 exit 1
 fi
-verify_release_checksum "github.com{tag_version}/x-ui-linux-$(arch).tar.gz" "${xui_folder}-linux-$(arch).tar.gz"
+verify_release_checksum "github.com${tag_version}/x-ui-linux-$(arch).tar.gz" "${xui_folder}-linux-$(arch).tar.gz"
 else
 tag_version=$1
 if [[ "$tag_version" == "dev" || "$tag_version" == "dev-latest" ]]; then
@@ -998,7 +998,7 @@ if [[ "$(printf '%s\n' "$min_version" "$tag_version_numeric" | sort -V | head -n
 exit 1
 fi
 fi
-url="github.com{tag_version}/x-ui-linux-$(arch).tar.gz"
+url="github.com${tag_version}/x-ui-linux-$(arch).tar.gz"
 curl -fLR --retry 5 --retry-delay 3 --connect-timeout 15 --speed-limit 1 --speed-time 300 -o ${xui_folder}-linux-$(arch).tar.gz ${url}
 if [[ $? -ne 0 || ! -s ${xui_folder}-linux-$(arch).tar.gz ]]; then
 rm -f ${xui_folder}-linux-$(arch).tar.gz
