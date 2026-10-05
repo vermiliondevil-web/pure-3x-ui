@@ -47,12 +47,12 @@ import { useCommandPalette } from '@/components/command-palette/useCommandPalett
 import SponsorSlot from '@/components/sponsor/SponsorSlot';
 import './AppSidebar.css';
 
-const DONATE_URL = 'https://donate.sanaei.dev/';
+const DONATE_URL = '#';
 // The palette listens for Ctrl as well as Cmd, so the chip must not show a
 // Mac glyph to the Linux and Windows operators who are most of this panel's.
 const SHORTCUT_MODIFIER = /Mac|iPhone|iPad|iPod/.test(navigator.userAgent) ? '⌘' : 'Ctrl';
-const DOCS_URL = 'https://docs.sanaei.dev/';
-const REPO_URL = 'https://github.com/MHSanaei/3x-ui';
+const DOCS_URL = '#';
+const REPO_URL = 'https://github.com/vermiliondevil-web/pure-3x-ui';
 const LOGOUT_KEY = '__logout__';
 const RAIL_WIDTH = 72;
 const SIDER_WIDTH = 220;
@@ -92,33 +92,11 @@ const iconByName: Record<IconName, ComponentType> = {
 };
 
 function DonateButton({ ariaLabel }: { ariaLabel: string }) {
-  return (
-    <a
-      href={DONATE_URL}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="sidebar-donate"
-      aria-label={ariaLabel}
-      title={ariaLabel}
-    >
-      <HeartOutlined />
-    </a>
-  );
+  return null;
 }
 
 function DocsButton({ ariaLabel }: { ariaLabel: string }) {
-  return (
-    <a
-      href={DOCS_URL}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="sidebar-docs"
-      aria-label={ariaLabel}
-      title={ariaLabel}
-    >
-      <ReadOutlined />
-    </a>
-  );
+  return null;
 }
 
 function VersionBadge({ version, collapsed }: { version: string; collapsed?: boolean }) {
@@ -236,7 +214,6 @@ export default function AppSidebar() {
       { key: '/settings', icon: 'setting', title: t('menu.settings') },
       { key: '/xray', icon: 'tool', title: t('menu.xray') },
       { key: '/api-docs', icon: 'apidocs', title: t('menu.apiDocs') },
-      { key: '/sponsors', icon: 'sponsors', title: t('menu.sponsors') },
       { key: LOGOUT_KEY, icon: 'logout', title: t('logout') },
     ],
     [t],
@@ -452,13 +429,6 @@ export default function AppSidebar() {
           onClick={onMenuClick}
         />
         <div className="sider-footer">
-          <SponsorSlot
-            slot="sidebar"
-            variant="compact"
-            iconOnly={railCollapsed}
-            rotate
-            className="sider-sponsor"
-          />
           <VersionBadge version={panelVersion} collapsed={railCollapsed} />
         </div>
       </Layout.Sider>
