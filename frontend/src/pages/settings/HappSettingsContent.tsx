@@ -30,15 +30,17 @@ export default function HappSettingsContent({
   const { t } = useTranslation();
   const [messageApi, messageContextHolder] = message.useMessage();
   // Generator choices stay local until Apply updates the draft; page Save persists it.
-  const [selectedPreset, setSelectedPreset] = useState<string>('iran-bypass');
+  const [selectedPreset, setSelectedPreset] = useState<string>('lan-bypass');
   const [includeAdblock, setIncludeAdblock] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const applyPreset = () => {
-    const payload = buildHappPresetDeeplink(selectedPreset, includeAdblock);
-    if (payload) {
-      updateSetting({ subRoutingRules: payload });
-      messageApi.success(t('pages.settings.subHappPresetApplied'));
+    const payload = if (selectedPreset === 'russia-bypass') {
+  const ruPayload = "happ://routing/rules?direct=regexp:\\.ru$,regexp:\\.su$,regexp:\\.rf$,geoip:private&proxy=geosite:category-vpn-out,geosite:google,geosite:meta";
+  updateSetting({ subRoutingRules: ruPayload });
+  messageApi.success('Пресет обхода блокировок РФ/СНГ успешно применен');
+  return;
+}
     }
   };
 
@@ -109,6 +111,7 @@ export default function HappSettingsContent({
                       style={{ minWidth: 170 }}
                       onChange={setSelectedPreset}
                       options={[
+                        { value: 'russia-bypass', label: 'Russia / CIS Bypass (РФ и СНГ)' },
                         { value: 'iran-bypass', label: t('pages.settings.subHappPresetIran') },
                         { value: 'china-direct', label: t('pages.settings.subHappPresetChina') },
                         { value: 'global', label: t('pages.settings.subHappPresetGlobal') },
