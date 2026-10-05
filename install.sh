@@ -20,7 +20,7 @@ elif [[ -f /usr/lib/os-release ]]; then
     source /usr/lib/os-release
     release=$ID
 else
-    echo "Failed to check the system OS, please contact the author!" >&2
+    echo "Failed to check the system OS." >&2
     exit 1
 fi
 echo "The OS release is: $release"
