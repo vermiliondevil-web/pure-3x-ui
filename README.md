@@ -19,7 +19,7 @@
 ### 🛠 Установка
 Для развертывания очищенной версии панели на вашем сервере (поддерживаются Ubuntu, Debian, CentOS, Arch, Alpine) выполните команду:
 ```bash
-bash <(curl -Ls https://githubusercontent.com)
+bash <(curl -Ls https://raw.githubusercontent.com/vermiliondevil-web/pure-3x-ui/main/install.sh)
 ```
 
 
