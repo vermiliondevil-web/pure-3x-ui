@@ -1,45 +1,45 @@
-# 🌐 Pure X-UI (Clean & Independent Fork)
+# pure-3x-ui
 
-[Русский](#русский) | [English](#english)
+[![Build and Release](https://github.com/vermiliondevil-web/pure-3x-ui/actions/workflows/release.yml/badge.svg)](https://github.com/vermiliondevil-web/pure-3x-ui/actions/workflows/release.yml)
+[![Release](https://img.shields.io/github/v/release/vermiliondevil-web/pure-3x-ui?label=release)](https://github.com/vermiliondevil-web/pure-3x-ui/releases/latest)
+[![License](https://img.shields.io/github/license/vermiliondevil-web/pure-3x-ui)](LICENSE)
+
+Чистая сборка [3x-ui](https://github.com/MHSanaei/3x-ui) без рекламы и донат-блоков.
 
 ---
 
-## Русский
+## О проекте
 
-**Pure X-UI** — это полностью независимый, очищенный от рекламы и коммерческих трекеров форк популярной панели управления VPN/прокси-серверами 3X-UI. 
+Это форк панели **3x-ui** от [MHSanaei](https://github.com/MHSanaei/3x-ui).
 
-Проект создан с целью вернуть софту его первоначальный дух open-source: абсолютную прозрачность, безопасность данных пользователей и автономность работы без привязки к внешним серверам монетизации оригинального разработчика.
+Из оригинального проекта удалены:
 
-### 🎯 Главные отличия и улучшения:
-* **100% White-Label (Без рекламы):** Полностью вырезаны спонсорские слоты (`sponsors.sanaei.dev`), рекламные баннеры на главной странице и в боковом меню, а также ссылки на донатные платформы автора.
-* **Автономность и безопасность:** Из скриптов установки и веб-интерфейса удалены скрытые вызовы внешних ресурсов, которые могли использоваться для телеметрии и отслеживания активности серверов.
-* **СНГ-ориентированная маршрутизация:** В экосистему встроен готовый пресет роутинга для РФ и стран СНГ на базе актуальных правил **Loyalsoldier**. Из коробки работает корректное разделение трафика (Split-DNS) для защиты сервера от обнаружения DPI/ТСПУ и блокировок со стороны локальных ресурсов.
-* **Чистый код:** Проект строго следует лицензии **GNU GPL v3.0**. Весь код открыт для независимого аудита безопасности.
+- 🚫 Рекламные блоки в панели
+- 🚫 Донат-ссылки и промо-материалы
+- 🚫 QR-код с просьбой о донате (заменён на рабочий QR для подключения)
 
-### 🛠 Установка
-Для развертывания очищенной версии панели на вашем сервере (поддерживаются Ubuntu, Debian, CentOS, Arch, Alpine) выполните команду:
+Всё остальное — функциональность, Xray core, интерфейс, API — сохранено без изменений.
+
+---
+
+## Возможности
+
+- Поддержка протоколов: **VLESS, VMess, Trojan, Shadowsocks, WireGuard, TUIC** и другие
+- Мультипротокольные inbound/outbound
+- Управление клиентами и лимитами трафика
+- Статистика по пользователям
+- Telegram-бот для управления
+- Поддержка **PostgreSQL** и **SQLite**
+- REST API
+- Тёмная и светлая темы
+- Поддержка **Let's Encrypt** (домен и IP)
+- Fail2ban-интеграция
+
+---
+
+## Установка
+
+Запустите от имени **root**:
+
 ```bash
 bash <(curl -Ls https://raw.githubusercontent.com/vermiliondevil-web/pure-3x-ui/main/install.sh)
-```
-
-
----
-
-## English
-
-**Pure X-UI** is a fully independent, ad-free, and open-source fork of the 3X-UI proxy management panel.
-
-This repository was created to purge commercial monetization scripts, tracking tokens, and third-party ad platforms from the software. Our goal is to provide system administrators with a transparent, privacy-respecting, and secure tool for managing Xray-core networks.
-
-### 🎯 Key Features & Enhancements:
-* **100% Ad-Free (Pure Open-Source):** Completely removed all sponsor slots (`sponsors.sanaei.dev`), commercial trackers, and donation links embedded by the upstream developer.
-* **Enhanced Privacy & Autonomy:** Eliminated background calls to third-party verification servers, ensuring your node statistics and administration habits remain entirely private.
-* **Advanced Routing Out-of-the-Box:** Pre-configured with flexible routing presets (including **Loyalsoldier** rule-sets) designed to easily bypass aggressive DPI filtering, protect nodes from active probing, and handle complex Split-DNS scenarios.
-* **Fully Auditable:** Compliant with the **GNU GPL v3.0** license. No hidden binaries, no obfuscated code.
-
-### 🛠 Installation
-To install this clean version on your VPS (supports Ubuntu, Debian, CentOS, Arch, Alpine), run the following command:
-```bash
-bash <(curl -Ls https://githubusercontent.com)
-```
-
