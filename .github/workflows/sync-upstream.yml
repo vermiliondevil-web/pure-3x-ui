@@ -26,6 +26,7 @@ jobs:
       - name: Sync with upstream
         run: |
           # Добавляем репозиторий Санаи как upstream
+          git config merge.ours.driver true   # ← добавить эту строку
           git remote add upstream https://github.com/MHSanaei/3x-ui.git
           git fetch upstream main
 
