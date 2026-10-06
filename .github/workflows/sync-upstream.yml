@@ -4,16 +4,16 @@ on:
   schedule:
     # Каждый день в 03:00 UTC (06:00 МСК)
     - cron: '0 3 * * *'
-  workflow_dispatch:  # Кнопка для ручного запуска
+  workflow_dispatch:
 
 jobs:
   sync:
-    runs-on: ubuntu-24.04   # ← вместо ubuntu-latest
+    runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
       - name: Checkout fork
-        uses: actions/checkout@v5   # ← вместо v4
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -25,19 +25,27 @@ jobs:
 
       - name: Sync with upstream
         run: |
-          # Добавляем репозиторий Санаи как upstream
-          git config merge.ours.driver true   # ← добавить эту строку
-          git remote add upstream https://github.com/MHSanaei/3x-ui.git
+          git remote add upstream https://github.com/MHSanaei/3x-ui.git || true
           git fetch upstream main
 
-          # Проверяем, есть ли новые коммиты
           if git merge-base --is-ancestor upstream/main HEAD; then
-            echo "Уже синхронизировано с upstream."
+            echo "Already up to date with upstream."
             exit 0
           fi
 
-          # Вливаем изменения
-          git merge upstream/main --no-edit
+          if ! git merge upstream/main --no-edit; then
+            echo "=== MERGE CONFLICT ==="
+            git status
+            git diff --name-only --diff-filter=U
+            git merge --abort
+            exit 1
+          fi
 
-          # Пушим обратно в ваш форк
-          git push origin main
+      - name: Strip ads after upstream merge
+        run: |
+          bash scripts/remove-ads.sh
+          git add -A
+          git diff --cached --quiet || git commit -m "chore: auto strip ads after upstream merge"
+
+      - name: Push changes
+        run: git push origin main
