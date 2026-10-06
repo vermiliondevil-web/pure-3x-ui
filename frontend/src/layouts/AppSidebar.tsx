@@ -11,14 +11,12 @@ import {
   CloudServerOutlined,
   ClusterOutlined,
   CodeOutlined,
-  CrownOutlined,
   DashboardOutlined,
   DatabaseOutlined,
   DiscordOutlined,
   ExportOutlined,
   GithubOutlined,
   GlobalOutlined,
-  HeartOutlined,
   ImportOutlined,
   LogoutOutlined,
   MailOutlined,
@@ -44,10 +42,8 @@ import { formatPanelVersion } from '@/lib/panel-version';
 import { pauseAnimationsUntilLeave, useTheme } from '@/hooks/useTheme';
 import { useAllSettings } from '@/api/queries/useAllSettings';
 import { useCommandPalette } from '@/components/command-palette/useCommandPalette';
-import SponsorSlot from '@/components/sponsor/SponsorSlot';
 import './AppSidebar.css';
 
-const DONATE_URL = '#';
 // The palette listens for Ctrl as well as Cmd, so the chip must not show a
 // Mac glyph to the Linux and Windows operators who are most of this panel's.
 const SHORTCUT_MODIFIER = /Mac|iPhone|iPad|iPod/.test(navigator.userAgent) ? '⌘' : 'Ctrl';
@@ -70,7 +66,6 @@ type IconName =
   | 'cluster'
   | 'hosts'
   | 'logout'
-  | 'sponsors'
   | 'apidocs'
   | 'outbound'
   | 'routing';
@@ -85,15 +80,11 @@ const iconByName: Record<IconName, ComponentType> = {
   cluster: ClusterOutlined,
   hosts: GlobalOutlined,
   logout: LogoutOutlined,
-  sponsors: CrownOutlined,
   apidocs: ApiOutlined,
   outbound: ExportOutlined,
   routing: SwapOutlined,
 };
 
-function DonateButton({ ariaLabel }: { ariaLabel: string }) {
-  return null;
-}
 
 function DocsButton({ ariaLabel }: { ariaLabel: string }) {
   return null;
@@ -375,7 +366,6 @@ export default function AppSidebar() {
                 {pinned ? <PushpinFilled /> : <PushpinOutlined />}
               </button>
               <DocsButton ariaLabel={t('menu.docs') || 'Documentation'} />
-              <DonateButton ariaLabel={t('menu.donate') || 'Donate'} />
               <ThemeCycleButton
                 id="theme-cycle"
                 isDark={isDark}
@@ -452,7 +442,6 @@ export default function AppSidebar() {
           </div>
           <div className="drawer-header-actions">
             <DocsButton ariaLabel={t('menu.docs') || 'Documentation'} />
-            <DonateButton ariaLabel={t('menu.donate') || 'Donate'} />
             <ThemeCycleButton
               id="theme-cycle-drawer"
               isDark={isDark}
@@ -514,7 +503,6 @@ export default function AppSidebar() {
           }}
         />
         <div className="drawer-footer">
-          <SponsorSlot slot="sidebar" variant="compact" rotate className="sider-sponsor" />
           <VersionBadge version={panelVersion} />
         </div>
       </Drawer>
