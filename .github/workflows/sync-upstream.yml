@@ -1,0 +1,42 @@
+name: Sync Upstream
+
+on:
+  schedule:
+    # Каждый день в 03:00 UTC (06:00 МСК)
+    - cron: '0 3 * * *'
+  workflow_dispatch:  # Кнопка для ручного запуска
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout fork
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Sync with upstream
+        run: |
+          # Добавляем репозиторий Санаи как upstream
+          git remote add upstream https://github.com/MHSanaei/3x-ui.git
+          git fetch upstream main
+
+          # Проверяем, есть ли новые коммиты
+          if git merge-base --is-ancestor upstream/main HEAD; then
+            echo "Уже синхронизировано с upstream."
+            exit 0
+          fi
+
+          # Вливаем изменения
+          git merge upstream/main --no-edit
+
+          # Пушим обратно в ваш форк
+          git push origin main
