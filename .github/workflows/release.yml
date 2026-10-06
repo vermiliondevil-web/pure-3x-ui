@@ -3,7 +3,13 @@ name: Build and Release
 on:
   push:
     tags:
-      - 'v*'  # запуск при пуше тега, начинающегося с v
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to build (e.g. v1.0.3)'
+        required: true
+        default: 'v1.0.3'
 
 permissions:
   contents: write
@@ -15,39 +21,59 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libsqlite3-dev
+
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.22'  # укажите версию из вашего go.mod
+          go-version: '1.27.1'
 
-      - name: Setup Node (для сборки фронтенда)
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '26'
+
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm install
 
       - name: Build frontend
         run: |
-          cd internal/web
-          npm ci
+          cd frontend
           npm run build
-          cd ../..
 
       - name: Build Go binary
         run: |
-          CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -ldflags "-w -s" -o x-ui main.go
+          CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -ldflags "-w -s" -o x-ui-main main.go
 
-      - name: Prepare release package
+      - name: Download Xray core
         run: |
-          mkdir -p x-ui/bin
-          cp x-ui ./x-ui/x-ui
-          cp x-ui.sh ./x-ui/x-ui.sh
-          cp x-ui.service ./x-ui/x-ui.service 2>/dev/null || true
-          cp x-ui.service.debian ./x-ui/ 2>/dev/null || true
-          # Если у вас есть xray в репозитории — скопируйте его в bin
-          # cp bin/xray-linux-amd64 ./x-ui/bin/ 2>/dev/null || true
-          tar -czvf x-ui-linux-amd64.tar.gz -C x-ui .
+          mkdir -p pkg/x-ui/bin
+          wget -q -O /tmp/xray.zip https://github.com/XTLS/Xray-core/releases/latest/download/Xray-linux-64.zip
+          unzip -q /tmp/xray.zip -d pkg/x-ui/bin/
+          rm /tmp/xray.zip
+          chmod +x pkg/x-ui/bin/*
 
-      - name: Upload release asset
+      - name: Prepare package
+        run: |
+          cp x-ui-main pkg/x-ui/x-ui
+          cp x-ui.sh pkg/x-ui/x-ui.sh
+          cp x-ui.service.debian pkg/x-ui/ 2>/dev/null || true
+          cp x-ui.service.arch pkg/x-ui/ 2>/dev/null || true
+          cp x-ui.service.rhel pkg/x-ui/ 2>/dev/null || true
+          cp x-ui.rc pkg/x-ui/ 2>/dev/null || true
+          chmod +x pkg/x-ui/x-ui pkg/x-ui/x-ui.sh
+          tar -czvf x-ui-linux-amd64.tar.gz -C pkg x-ui
+          sha256sum x-ui-linux-amd64.tar.gz > x-ui-linux-amd64.tar.gz.sha256
+
+      - name: Create release
         uses: softprops/action-gh-release@v2
         with:
-          files: x-ui-linux-amd64.tar.gz
+          tag_name: ${{ github.event.inputs.tag || github.ref_name }}
+          files: |
+            x-ui-linux-amd64.tar.gz
+            x-ui-linux-amd64.tar.gz.sha256
