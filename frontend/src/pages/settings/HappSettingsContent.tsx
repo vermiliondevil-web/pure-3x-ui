@@ -35,12 +35,16 @@ export default function HappSettingsContent({
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const applyPreset = () => {
-    const payload = if (selectedPreset === 'russia-bypass') {
-  const ruPayload = "happ://routing/rules?direct=regexp:\\.ru$,regexp:\\.su$,regexp:\\.rf$,geoip:private&proxy=geosite:category-vpn-out,geosite:google,geosite:meta";
-  updateSetting({ subRoutingRules: ruPayload });
-  messageApi.success('Пресет обхода блокировок РФ/СНГ успешно применен');
-  return;
-}
+    if (selectedPreset === 'russia-bypass') {
+      const ruPayload = "happ://routing/rules?direct=regexp:\\.ru$,regexp:\\.su$,regexp:\\.rf$,geoip:private&proxy=geosite:category-vpn-out,geosite:google,geosite:meta";
+      updateSetting({ subRoutingRules: ruPayload });
+      messageApi.success('Пресет обхода блокировок РФ/СНГ успешно применен');
+      return;
+    }
+    const payload = buildHappPresetDeeplink(selectedPreset, includeAdblock);
+    if (payload) {
+      updateSetting({ subRoutingRules: payload });
+      messageApi.success(t('pages.settings.subHappPresetApplied'));
     }
   };
 
