@@ -29,6 +29,18 @@ if [[ -f "$ASB" ]]; then
   sed -i '/^  CrownOutlined,$/d' "$ASB" 2>/dev/null || true
   sed -i '/^  HeartOutlined,$/d' "$ASB" 2>/dev/null || true
   sed -i '/^import SponsorSlot from/d' "$ASB" 2>/dev/null || true
+  # Убираем DocsButton (кнопка документации)
+  sed -i '/^  ReadOutlined,$/d' "$ASB" 2>/dev/null || true
+  sed -i "/^const DOCS_URL = /d" "$ASB" 2>/dev/null || true
+  sed -i '/<DocsButton /d' "$ASB" 2>/dev/null || true
+
+  python3 - "$ASB" <<'PYEOF'
+import re, sys
+p = sys.argv[1]
+s = open(p, encoding='utf-8').read()
+s = re.sub(r"function DocsButton\([^)]*\)\s*\{[^{}]*\}\s*\n?", "", s, flags=re.DOTALL)
+open(p, 'w', encoding='utf-8').write(s)
+PYEOF
 
   # Удаляем DONATE_URL
   sed -i "/^const DONATE_URL = /d" "$ASB" 2>/dev/null || true
