@@ -26,7 +26,6 @@ import {
   MoonOutlined,
   PushpinFilled,
   PushpinOutlined,
-  ReadOutlined,
   SafetyOutlined,
   SearchOutlined,
   SettingOutlined,
@@ -47,7 +46,6 @@ import './AppSidebar.css';
 // The palette listens for Ctrl as well as Cmd, so the chip must not show a
 // Mac glyph to the Linux and Windows operators who are most of this panel's.
 const SHORTCUT_MODIFIER = /Mac|iPhone|iPad|iPod/.test(navigator.userAgent) ? '⌘' : 'Ctrl';
-const DOCS_URL = '#';
 const REPO_URL = 'https://github.com/vermiliondevil-web/pure-3x-ui';
 const LOGOUT_KEY = '__logout__';
 const RAIL_WIDTH = 72;
@@ -85,10 +83,6 @@ const iconByName: Record<IconName, ComponentType> = {
   routing: SwapOutlined,
 };
 
-
-function DocsButton({ ariaLabel }: { ariaLabel: string }) {
-  return null;
-}
 
 function VersionBadge({ version, collapsed }: { version: string; collapsed?: boolean }) {
   if (!version) return null;
@@ -365,7 +359,6 @@ export default function AppSidebar() {
               >
                 {pinned ? <PushpinFilled /> : <PushpinOutlined />}
               </button>
-              <DocsButton ariaLabel={t('menu.docs') || 'Documentation'} />
               <ThemeCycleButton
                 id="theme-cycle"
                 isDark={isDark}
@@ -441,7 +434,6 @@ export default function AppSidebar() {
             <span className="drawer-brand">3X-UI</span>
           </div>
           <div className="drawer-header-actions">
-            <DocsButton ariaLabel={t('menu.docs') || 'Documentation'} />
             <ThemeCycleButton
               id="theme-cycle-drawer"
               isDark={isDark}
