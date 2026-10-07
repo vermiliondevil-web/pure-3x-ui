@@ -13,6 +13,34 @@ FAIL=0
 
 echo "==> remove-ads.sh: старт в $REPO_ROOT"
 
+# ---------- 0. Брендирование панели: обновления с нашего репозитория ----------
+echo "[0/5] Брендируем панель (ссылки на наш репозиторий)..."
+
+# 0.1. panel.go — ссылки на GitHub API и raw
+PANEL_GO=internal/web/service/panel/panel.go
+if [[ -f "$PANEL_GO" ]]; then
+  sed -i 's|api.github.com/repos/MHSanaei/3x-ui|api.github.com/repos/vermiliondevil-web/pure-3x-ui|g' "$PANEL_GO" 2>/dev/null || true
+  sed -i 's|raw.githubusercontent.com/MHSanaei/3x-ui|raw.githubusercontent.com/vermiliondevil-web/pure-3x-ui|g' "$PANEL_GO" 2>/dev/null || true
+fi
+
+# 0.2. update.sh — заменяем на нашу обёртку над install.sh
+cat > update.sh <<'UPDEOF'
+#!/bin/bash
+# pure-3x-ui updater — вызывает install.sh из нашего репозитория.
+
+set -e
+
+REPO="vermiliondevil-web/pure-3x-ui"
+BRANCH="main"
+INSTALL_URL="https://raw.githubusercontent.com/${REPO}/${BRANCH}/install.sh"
+
+echo "==> pure-3x-ui updater"
+echo "==> Скачиваем install.sh из ${REPO}..."
+
+bash <(curl -Ls "${INSTALL_URL}")
+UPDEOF
+chmod +x update.sh
+
 # ---------- 1. Удаляем файлы рекламы ----------
 echo "[1/5] Удаляем файлы рекламы..."
 rm -rf frontend/src/components/sponsor/ 2>/dev/null || true
