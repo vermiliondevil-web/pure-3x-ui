@@ -5,6 +5,21 @@
 [![Release](https://img.shields.io/github/v/release/vermiliondevil-web/pure-3x-ui?label=release)](https://github.com/vermiliondevil-web/pure-3x-ui/releases/latest)
 [![License](https://img.shields.io/github/license/vermiliondevil-web/pure-3x-ui)](LICENSE)
 
+> **О бейджах.** Бейдж `Build and Release` показывает **последний прогон** workflow. Если он **красный** — это **не значит**, что ваш форк сломан. Возможные причины:
+>
+> - **Upstream-автор** (MHSanaei) запушил коммит, который **не прошёл** сборку (`npm run build` или `go build`).
+> - **`Sync Upstream`** подтянул этот коммит в ваш `main`.
+> - **`Build and Release`** попытался собрать — и **упал** (потому что код **сам по себе сломан** у автора).
+> - **Ваш форк** при этом **не сломан** — просто upstream **временно нестабилен**.
+>
+> **Что делать:**
+>
+> - **Ничего.** Подождите, пока MHSanaei **исправит** свой код.
+> - Или **откатите** проблемный коммит (`git reset --hard HEAD~1 && git push --force`).
+> - **Релиз** `v3.9.2` (последний стабильный) **продолжает работать** — вы можете **не обновляться** до исправления.
+>
+> То же касается бейджа `Sync Upstream` — если он **красный**, значит, merge **не прошёл** (конфликты). Это **тоже не критично** — можно **разрешить конфликты вручную**.
+
 Чистая сборка [3x-ui](https://github.com/MHSanaei/3x-ui) без рекламы и донат-блоков.
 
 **Работает из России** — установка и обновление идут через [jsDelivr](https://www.jsdelivr.com/), потому что `raw.githubusercontent.com` блокируется РКН.
