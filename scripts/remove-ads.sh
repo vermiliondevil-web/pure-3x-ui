@@ -15,6 +15,15 @@ echo "==> remove-ads.sh: старт в $REPO_ROOT"
 
 # ---------- 0. Брендирование панели: обновления с нашего репозитория ----------
 echo "[0/5] Брендируем панель (ссылки на наш репозиторий)..."
+# Обход блокировки ТСПУ: заменяем raw.githubusercontent на jsDelivr
+for f in install.sh update.sh x-ui.sh internal/web/service/panel/panel.go README.md; do
+  if [[ -f "$f" ]]; then
+    sed -i 's|https://raw\.githubusercontent\.com/vermiliondevil-web/pure-3x-ui/|https://cdn.jsdelivr.net/gh/vermiliondevil-web/pure-3x-ui@|g' "$f" 2>/dev/null || true
+  fi
+done
+
+# Восстанавливаем fallback для dev-архива (jsDelivr не отдаёт >20 МБ)
+sed -i 's|https://cdn\.jsdelivr\.net/gh/vermiliondevil-web/pure-3x-ui@main/x-ui-linux-\$(arch)\.tar\.gz|https://github.com/vermiliondevil-web/pure-3x-ui/raw/main/x-ui-linux-$(arch).tar.gz|g' install.sh 2>/dev/null || true
 
 # 0.1. panel.go — ссылки на GitHub API и raw
 PANEL_GO=internal/web/service/panel/panel.go
@@ -38,7 +47,7 @@ set -e
 
 REPO="vermiliondevil-web/pure-3x-ui"
 BRANCH="main"
-INSTALL_URL="https://raw.githubusercontent.com/${REPO}/${BRANCH}/install.sh"
+INSTALL_URL="https://cdn.jsdelivr.net/gh/${REPO}@${BRANCH}/install.sh"
 
 echo "==> pure-3x-ui updater"
 echo "==> Скачиваем install.sh из ${REPO}..."
@@ -191,7 +200,7 @@ for path in sorted(glob.glob('internal/web/translation/*.json')):
 PYEOF
 
 # ---------- 6. Проверка синтаксиса ----------
-echo "==> Проверяем TypeScript..."
+echo "==> Проверка TypeScript пропущена (см. release.yml)"
 cd frontend
 if ! npx tsc --noEmit 2>&1 | tee /tmp/tsc.log; then
   echo ""
