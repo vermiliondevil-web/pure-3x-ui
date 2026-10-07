@@ -23,6 +23,12 @@ if [[ -f "$PANEL_GO" ]]; then
   sed -i 's|raw.githubusercontent.com/MHSanaei/3x-ui|raw.githubusercontent.com/vermiliondevil-web/pure-3x-ui|g' "$PANEL_GO" 2>/dev/null || true
 fi
 
+# Брендирование версии: устанавливаем нашу версию (совпадает с последним тегом)
+VERSION_FILE=internal/config/version
+if [[ -f "$VERSION_FILE" ]]; then
+  echo -n "3.9.1" > "$VERSION_FILE"
+fi
+
 # 0.2. update.sh — заменяем на нашу обёртку над install.sh
 cat > update.sh <<'UPDEOF'
 #!/bin/bash
