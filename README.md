@@ -201,8 +201,6 @@ bash <(curl -Ls https://cdn.jsdelivr.net/gh/vermiliondevil-web/pure-3x-ui@main/i
 
 **Вариант Б: остаться на российском, но использовать jsDelivr**
 
-Ваш `install.sh` **уже** работает через **jsDelivr** — это **обход** блокировки `raw.githubusercontent.com`. **Это работает** — установка прошла успешно.
-
 **Вариант В: обход на уровне сети**
 
 - **IPv6** — часто **менее цензурирован**, чем IPv4.
