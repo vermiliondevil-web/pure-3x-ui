@@ -418,6 +418,111 @@ https://github.com/vermiliondevil-web/pure-3x-ui/actions
 
 ---
 
+## 🖥️ Инженерный сервер из дешёвого VPS
+
+Не обязательно иметь **мощный сервер** для сборки и отладки. Даже **VPS за 100–200₽/мес** подойдёт — если правильно его настроить.
+
+### ⚠️ Важно: о российских провайдерах
+
+**RocketCloud, Timeweb, Beget** и другие **российские хостеры** — **не идеальны** для инженерного сервера:
+
+| Проблема | Что происходит |
+|---|---|
+| **ТСПУ** | `raw.githubusercontent.com` **блокируется** — TLS-хендшейк рвётся |
+| **VPN-детект** | IP помечен как VPN/Hosting — некоторые сервисы **отказывают** |
+| **Поддержка** | Часто **не отвечает** |
+| **Производительность** | **Низкая** на дешёвых тарифах |
+| **DNS** | Фейковые IP для заблокированных доменов |
+
+**Это не значит**, что на них **нельзя работать**. **Можно** — но с **обходами** (jsDelivr, DoH, chattr +i на resolv.conf).
+
+### 🛠️ Минимальные требования
+
+| Ресурс | Минимум | Рекомендую |
+|---|---|---|
+| **RAM** | 1 ГБ | **2 ГБ** (для `npm install` + `go build`) |
+| **Swap** | 2 ГБ | 2 ГБ (обязательно!) |
+| **Диск** | 10 ГБ | **20 ГБ** (node_modules ~500 МБ) |
+| **CPU** | 1 ядро | 2 ядра (сборка быстрее) |
+| **ОС** | Ubuntu 22.04 | Ubuntu 22.04 / 24.04 |
+
+### 📦 Что установить
+
+```bash
+# 1. Swap (если нет) — критично для слабого VPS
+fallocate -l 2G /swapfile
+chmod 600 /swapfile
+mkswap /swapfile
+swapon /swapfile
+echo '/swapfile none swap sw 0 0' >> /etc/fstab
+
+# 2. Базовые пакеты
+apt-get update
+apt-get install -y git curl wget unzip build-essential ca-certificates libsqlite3-dev
+
+# 3. Go 1.27.1 (версия из go.mod)
+cd /usr/local
+wget -q https://go.dev/dl/go1.27.1.linux-amd64.tar.gz
+tar -xzf go1.27.1.linux-amd64.tar.gz
+rm go1.27.1.linux-amd64.tar.gz
+echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
+source ~/.bashrc
+
+# 4. Node.js 26 (версия из .nvmrc)
+curl -fsSL https://deb.nodesource.com/setup_26.x | bash -
+apt-get install -y nodejs
+```
+
+### 📥 Клонирование и сборка
+
+```bash
+# Клонируем (через github.com, не raw)
+git clone https://github.com/vermiliondevil-web/pure-3x-ui.git
+cd pure-3x-ui
+
+# Фронтенд
+cd frontend
+npm install
+npm run build
+cd ..
+
+# Go-бинарник
+CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -ldflags "-w -s" -o x-ui-main main.go
+
+# Проверка
+file x-ui-main
+# → ELF 64-bit LSB executable, x86-64
+```
+
+### ⚠️ Проблемы и решения
+
+| Проблема | Причина | Решение |
+|---|---|---|
+| **`Could not resolve host`** | DNS сломан | `cat > /etc/resolv.conf <<EOF nameserver 1.1.1.1 nameserver 8.8.8.8 EOF` + `chattr +i` |
+| **`raw.githubusercontent.com` timeout** | ТСПУ | Использовать **jsDelivr** (`cdn.jsdelivr.net/gh/...`) |
+| **`npm install` зависает** | Мало RAM | Swap обязателен; или `npm install --prefer-offline` |
+| **`tsc --noEmit` долго** | Слабый VPS | **Отключить** `tsc` в `remove-ads.sh` (запускать в GitHub Actions) |
+| **`go build` падает** | Нет `libsqlite3-dev` | `apt-get install -y libsqlite3-dev` |
+| **Утечка памяти** | Xray или панель | Ограничить память через systemd или авто-рестарт |
+| **OOM Killer убивает процессы** | Мало RAM | Добавить swap или увеличить RAM |
+
+### 🎯 Рекомендации
+
+**Если VPS за 100₽ не справляется:**
+
+1. **Увеличьте swap** до 4 ГБ.
+2. **Соберите релиз через GitHub Actions** — не мучайте VPS.
+3. **Смените провайдера** — на **зарубежный** (AezaNet, VDSina) или **российский без цензуры**.
+
+**Если VPS работает — используйте его для:**
+
+- **Ручной сборки** (`make build`).
+- **Проверки релизов** перед установкой на боевой сервер.
+- **Тестирования** изменений.
+- **Обновления панели** через `install.sh`.
+
+**Для боевого сервера** — **отдельный VPS** с **больше RAM** (2+ ГБ) и **зарубежный** (если возможно).
+
 ### Полная автоматизация (опционально)
 
 Если хотите, чтобы **релизы создавались автоматически** после `Sync Upstream` — можно добавить в `sync-upstream.yml` шаг авто-тега. **Но это не рекомендуется**:
