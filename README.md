@@ -55,3 +55,12 @@
 
 ```bash
 bash <(curl -Ls https://cdn.jsdelivr.net/gh/vermiliondevil-web/pure-3x-ui@main/install.sh)
+
+**Альтернативные способы** (если jsDelivr недоступен):
+
+```bash
+# Через github.com/raw (тоже работает, но медленнее)
+bash <(curl -Ls "https://github.com/vermiliondevil-web/pure-3x-ui/raw/main/install.sh")
+
+# Через конкретный коммит (обход кэша jsDelivr)
+bash <(curl -Ls https://cdn.jsdelivr.net/gh/vermiliondevil-web/pure-3x-ui@main/install.sh)
