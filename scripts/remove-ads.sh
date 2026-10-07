@@ -26,7 +26,7 @@ fi
 # Брендирование версии: устанавливаем нашу версию (совпадает с последним тегом)
 VERSION_FILE=internal/config/version
 if [[ -f "$VERSION_FILE" ]]; then
-  echo -n "3.9.1" > "$VERSION_FILE"
+  echo -n "3.9.2" > "$VERSION_FILE"
 fi
 
 # 0.2. update.sh — заменяем на нашу обёртку над install.sh
