@@ -5,7 +5,7 @@
 [![Release](https://img.shields.io/github/v/release/vermiliondevil-web/pure-3x-ui?label=release)](https://github.com/vermiliondevil-web/pure-3x-ui/releases/latest)
 [![License](https://img.shields.io/github/license/vermiliondevil-web/pure-3x-ui)](LICENSE)
 
-Чистая сборка [3x-ui](https://github.com/MHSanaei/3x-ui) без рекламы и донат-блоков.
+Чистая сборка [3x-ui](https://github.com/MHSanaei/3x-ui) без рекламы и донат-блоков. **Работает из России** — установка и обновление идут через [jsDelivr](https://www.jsdelivr.com/), потому что `raw.githubusercontent.com` блокируется РКН.
 
 ---
 
@@ -13,14 +13,20 @@
 
 Это форк панели **3x-ui** от [MHSanaei](https://github.com/MHSanaei/3x-ui).
 
-Из оригинального проекта удалены:
+**Удалено из оригинала:**
 
 - 🚫 Рекламные блоки в панели
 - 🚫 Донат-ссылки и промо-материалы
 - 🚫 Спонсорские слоты (`SponsorSlot`, `SponsorCard`, `SponsorsPage`)
 - 🚫 Кнопка доната в сайдбаре (`DonateButton`)
-- 🚫 Кнопка документации, ведущая на сторонние ресурсы (`DocsButton`)
+- 🚫 Кнопка документации на сторонние ресурсы (`DocsButton`)
 - 🚫 Ключи `donate` и `sponsors` из всех 13 языковых файлов
+
+**Изменено:**
+
+- 🔄 Все ссылки `raw.githubusercontent.com` → `cdn.jsdelivr.net/gh/` (обход блокировки РКН)
+- 🔄 `panel.go`, `install.sh`, `update.sh`, `README.md` — указывают на **этот** репозиторий
+- 🔄 Автоматизация через GitHub Actions: автосинхронизация с upstream, автоудаление рекламы
 
 Всё остальное — функциональность, Xray core, интерфейс, API, все протоколы — сохранено без изменений.
 
