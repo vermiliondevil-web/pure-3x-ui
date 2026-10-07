@@ -183,8 +183,8 @@ bash <(curl -Ls https://cdn.jsdelivr.net/gh/vermiliondevil-web/pure-3x-ui@main/i
 - `dig` возвращает **фейковые IP** для заблокированных доменов.
 
 **RocketCloud** — **пример такого провайдера**:
-- IP помечен как **VPN/Hosting** в публичных базах[citation:3].
-- Отзывы: **поддержка не отвечает**, **производительность низкая**, **ребрендинг SkyHost с 90% негатива**[citation:14][citation:16].
+- IP помечен как **VPN/Hosting** в публичных базах.
+- Отзывы: **поддержка не отвечает**, **производительность низкая**, **ребрендинг SkyHost с 90% негатива**.
 
 ### Что делать
 
@@ -194,10 +194,10 @@ bash <(curl -Ls https://cdn.jsdelivr.net/gh/vermiliondevil-web/pure-3x-ui@main/i
 
 | Провайдер | Особенность |
 |---|---|
-| **AezaNet** | Anti-complaint VPS, данные в РФ и Европе, криптоплатежи, **без real-name**[citation:18] |
-| **VDSina** | Серверы в NL, отзывы: **работает стабильно**, можно оплатить из РФ[citation:2] |
-| **Doubleservers** | 88% одобрения, серверы в FR/DE/PL[citation:1] |
-| **Soulful Hosting** | 82% одобрения, DE/PL[citation:1] |
+| **AezaNet** | Anti-complaint VPS, данные в РФ и Европе, криптоплатежи, **без real-name**|
+| **VDSina** | Серверы в NL, отзывы: **работает стабильно**, можно оплатить из РФ. |
+| **Doubleservers** | 88% одобрения, серверы в FR/DE/PL. |
+| **Soulful Hosting** | 82% одобрения, DE/PL. |
 
 **Вариант Б: остаться на российском, но использовать jsDelivr**
 
@@ -205,8 +205,8 @@ bash <(curl -Ls https://cdn.jsdelivr.net/gh/vermiliondevil-web/pure-3x-ui@main/i
 
 **Вариант В: обход на уровне сети**
 
-- **IPv6** — часто **менее цензурирован**, чем IPv4[citation:5].
-- **Свой DNS** через **DoH/DoT** (мы это делали).
+- **IPv6** — часто **менее цензурирован**, чем IPv4.
+- **Свой DNS** через **DoH/DoT**.
 - **VPN/прокси** для исходящих запросов.
 
 ### Почему это важно для этого проекта
