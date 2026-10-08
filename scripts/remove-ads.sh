@@ -168,37 +168,10 @@ open(p, 'w', encoding='utf-8').write(s)
 PYEOF
 fi
 
-# ---------- 5. Чистим локали через Python ----------
-echo "[5/5] Чистим локали через Python..."
-python3 <<'PYEOF'
-import json, glob, os
-
-for path in sorted(glob.glob('internal/web/translation/*.json')):
-    try:
-        with open(path, encoding='utf-8') as f:
-            data = json.load(f)
-    except json.JSONDecodeError as e:
-        print(f"SKIP (bad JSON): {path} — {e}")
-        continue
-
-    def strip(obj):
-        if isinstance(obj, dict):
-            obj.pop('donate', None)
-            obj.pop('sponsors', None)
-            for v in obj.values():
-                strip(v)
-        elif isinstance(obj, list):
-            for v in obj:
-                strip(v)
-
-    strip(data)
-
-    with open(path, 'w', encoding='utf-8') as f:
-        json.dump(data, f, indent=4, ensure_ascii=False)
-        f.write('\n')
-    print(f"OK: {path}")
-PYEOF
-
+# ---------- 5. Локали НЕ трогаем ----------
+# Ключи donate/sponsors остаются, но UI их не читает (компоненты удалены).
+# Это уменьшает diff и упрощает merge с upstream.
+echo "[5/5] Локали не трогаем (реклама в UI удалена через фронтенд)"
 # ---------- 6. Проверка синтаксиса ----------
 echo "==> Проверка TypeScript пропущена (см. release.yml)"
 cd frontend
