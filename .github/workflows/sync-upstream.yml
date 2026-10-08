@@ -38,6 +38,10 @@ jobs:
           # (это избегает конфликтов при merge)
           git checkout upstream/main -- internal/web/translation/ || true
           git checkout upstream/main -- update.sh || true
+          
+          # ШАГ 1.5: Коммитим эти изменения, чтобы merge не ругался
+          git add -A
+          git diff --cached --quiet || git commit -m "chore: take locales and update.sh from upstream (pre-merge)"
 
           # ШАГ 2: Мержим остальные файлы с -X theirs
           # (при конфликте берётся версия upstream)
