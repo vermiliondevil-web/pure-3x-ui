@@ -7,9 +7,9 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Tag to build (e.g. v1.0.4)'
+        description: 'Tag to build (e.g. v3.9.2)'
         required: true
-        default: 'v1.0.4'
+        default: 'v3.9.2'
 
 permissions:
   contents: write
@@ -20,6 +20,16 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Set version from tag
+        run: |
+          TAG="${{ github.event.inputs.tag || github.ref_name }}"
+          VERSION="${TAG#v}"
+          echo "Setting version to: $VERSION"
+          echo -n "$VERSION" > internal/config/version
+          sed -i "s|echo -n \"[0-9.]*\"|echo -n \"$VERSION\"|" scripts/remove-ads.sh
+          echo "internal/config/version: $(cat internal/config/version)"
+          grep "echo -n" scripts/remove-ads.sh
 
       - name: Strip ads before build
         run: bash scripts/remove-ads.sh
