@@ -28,18 +28,26 @@ jobs:
           git remote add upstream https://github.com/MHSanaei/3x-ui.git || true
           git fetch upstream main
 
+          # Проверяем, есть ли новые коммиты
           if git merge-base --is-ancestor upstream/main HEAD; then
             echo "Already up to date with upstream."
             exit 0
           fi
 
-          if ! git merge upstream/main --no-edit; then
-            echo "=== MERGE CONFLICT ==="
+          # ШАГ 1: Берём локали и update.sh из upstream напрямую
+          # (это избегает конфликтов при merge)
+          git checkout upstream/main -- internal/web/translation/ || true
+          git checkout upstream/main -- update.sh || true
+
+          # ШАГ 2: Мержим остальные файлы с -X theirs
+          # (при конфликте берётся версия upstream)
+          git merge upstream/main -X theirs --no-edit || {
+            echo "=== MERGE CONFLICT (unexpected) ==="
             git status
             git diff --name-only --diff-filter=U
             git merge --abort
             exit 1
-          fi
+          }
 
       - name: Strip ads after upstream merge
         run: |
