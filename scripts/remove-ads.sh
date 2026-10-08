@@ -173,16 +173,8 @@ fi
 # Это уменьшает diff и упрощает merge с upstream.
 echo "[5/5] Локали не трогаем (реклама в UI удалена через фронтенд)"
 # ---------- 6. Проверка синтаксиса ----------
+# Пропущено — долго на слабом VPS. Полноценная проверка в GitHub Actions (release.yml).
 echo "==> Проверка TypeScript пропущена (см. release.yml)"
-cd frontend
-if ! npx tsc --noEmit 2>&1 | tee /tmp/tsc.log; then
-  echo ""
-  echo "ОШИБКА: tsc --noEmit не прошёл. Лог: /tmp/tsc.log"
-  echo "Откатите изменения: cd .. && git checkout -- . && git clean -fd frontend/src"
-  exit 1
-fi
-cd ..
-
 echo ""
 echo "==> Готово. Проверьте:"
 echo "    git status"
