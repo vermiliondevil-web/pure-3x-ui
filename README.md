@@ -55,6 +55,62 @@
 5. **Включите fail2ban** для реального применения ограничений по IP.
 6. **Регулярно делайте резервные копии** базы данных перед обновлениями.
 
+## Рекомендация: Автоматическая очистка IP-адресов
+
+Форк **сам по себе не решает** проблему хранения IP-адресов клиентов. Но оператор может **настроить автоматическую очистку на уровне VPS** — отдельно от кода панели. Ниже — полная инструкция.
+
+### Зачем это нужно
+
+Панель 3x-ui **хранит IP-адреса клиентов в открытом виде** в базе SQLite (`/etc/x-ui/x-ui.db`). Эти данные используются для:
+
+1. **Отображения** активных соединений в интерфейсе.
+2. **Ограничения по IP** (IP Limit) — блокировка при превышении количества устройств.
+
+**Проблема:** если база утечёт или сервер будет скомпрометирован — злоумышленник получит **реальные IP-адреса всех клиентов**. Для операторов в странах с цензурой это может привести к **идентификации и преследованию пользователей**.
+
+**Почему нельзя просто отключить запись IP:**
+
+| Способ | Проблема |
+|---|---|
+| Хеширование IP | Ломает IP Limit (нельзя сравнивать хеши) и отображение в UI |
+| Усечение IP | Скрывает точный адрес, но оставляет провайдера |
+| Полное отключение | Ломает IP Limit и fail2ban |
+
+Все эти способы требуют **правок Go-кода** — сложных, хрупких и **затираемых** при каждом `Sync Upstream`.
+
+### Компромисс: автоматическая очистка старых записей
+
+Вместо изменения логики записи — **удаление старых записей** через cron. IP хранятся только 30 минут, потом удаляются.
+
+#### Шаг 1. Создайте скрипт очистки
+
+```bash
+cat > /root/cleanup_client_ips.sh << 'EOF'
+#!/bin/bash
+DB="/etc/x-ui/x-ui.db"
+CUTOFF=$(date -d "30 minutes ago" +%s)
+
+# Очистка в inbound_client_ips (JSON-поле ips)
+sqlite3 "$DB" <<SQL
+UPDATE inbound_client_ips
+SET ips = (
+  SELECT json_group_array(json_object('ip', json_extract(value, '$.ip'), 'timestamp', json_extract(value, '$.timestamp')))
+  FROM json_each(ips)
+  WHERE json_extract(value, '$.timestamp') > $CUTOFF
+);
+DELETE FROM inbound_client_ips WHERE ips = '[]' OR ips IS NULL;
+SQL
+
+# Очистка node_client_ip (только если таблица существует)
+if sqlite3 "$DB" "SELECT name FROM sqlite_master WHERE type='table' AND name='node_client_ip';" | grep -q node_client_ip; then
+  sqlite3 "$DB" "DELETE FROM node_client_ip WHERE last_seen < datetime('now', '-30 minutes');"
+fi
+
+echo "[$(date)] Cleanup done."
+EOF
+
+chmod +x /root/cleanup_client_ips.sh
+
 ## О проекте
 
 Это форк панели **3x-ui** от [MHSanaei](https://github.com/MHSanaei/3x-ui).
