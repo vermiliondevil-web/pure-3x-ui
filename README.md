@@ -9,6 +9,16 @@
 
 Чистая сборка [3x-ui](https://github.com/MHSanaei/3x-ui) без рекламы и донат-блоков.
 
+<div style="border-left: 4px solid #d32f2f; padding-left: 16px; margin: 16px 0;">
+  <p><strong>⚠️ Не используйте <code>dev-latest</code> / pre-release сборки</strong></p>
+  <p>Сборки <code>dev-latest</code> (и любые pre-release) собираются автоматически из свежего <code>main</code> upstream и <strong>не проходят ручное тестирование</strong>. Они могут содержать:</p>
+  <ul>
+    <li><strong>Критические уязвимости</strong> (например, CVE-2026-98432 в Xray-core v26.10.29, связанная с MPTCP и позволяющая удалённое получение root).</li>
+    <li><strong>Сломанные конфигурации</strong> (несовместимость формата, регрессии в работе протоколов).</li>
+  </ul>
+  <p><strong>Для обновления используйте только стабильные релизы</strong> через кнопку «Обновить» в панели (Settings → Panel) или через <code>install.sh</code> с конкретным тегом. Не устанавливайте <code>dev-latest</code> на боевой сервер.</p>
+</div>
+
 
 ## **ПРИЗЫВ К КОММИТЕРАМ И КОНТРИБЬЮТОРАМ UPSTREAM**
 
