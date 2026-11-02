@@ -9,6 +9,16 @@
 
 A clean build of [3x-ui](https://github.com/MHSanaei/3x-ui) without ads or donation blocks.
 
+> [!CAUTION]
+> **Do not use `dev-latest` / pre-release builds**
+>
+> `dev-latest` builds (and any pre-release) are produced automatically from fresh upstream `main` and **do not go through manual testing**. They may contain:
+>
+> - **Critical vulnerabilities** (e.g. CVE-2026-98432 in Xray-core v26.10.29, related to MPTCP and allowing remote root access).
+> - **Broken configurations** (format incompatibility, protocol regressions).
+>
+> **Use only stable releases** via the "Update" button in the panel (Settings → Panel) or via `install.sh` with a specific tag. Do not install `dev-latest` on production.
+
 **A CALL TO UPSTREAM COMMITTERS AND CONTRIBUTORS**
 
 **This section is not a complaint. It is a demand on the development process.**
