@@ -260,6 +260,13 @@ bash <(curl -Ls "https://github.com/vermiliondevil-web/pure-3x-ui/raw/main/insta
 # 2. With a specific tag (stable release)
 bash <(curl -Ls https://raw.githubusercontent.com/vermiliondevil-web/pure-3x-ui/v3.9.22/install.sh)
 ```
+## Docker (alternative fork)
+
+This fork **does not include** a Docker build (use `install.sh` for personal VPS).
+
+If you need a **Docker image**, see the fork by [@Az-1-2](https://github.com/Az-1-2):
+it maintains a Docker build and installation instructions.
+
 ### What the script does
 
 1. Detects the OS and architecture.
