@@ -395,6 +395,13 @@ bash <(curl -Ls "https://github.com/vermiliondevil-web/pure-3x-ui/raw/main/insta
 # 2. С конкретным тегом (стабильный релиз)
 bash <(curl -Ls https://raw.githubusercontent.com/vermiliondevil-web/pure-3x-ui/v3.9.22/install.sh)
 ```
+## Docker (альтернативный форк)
+
+Этот форк **не включает** Docker-сборку (используйте `install.sh` для личных VPS).
+
+Если вам нужен **Docker-образ**, посмотрите форк [@Az-1-2](https://github.com/Az-1-2):
+он поддерживает Docker-сборку и инструкции по установке.
+
 
 ### Что делает скрипт
 
