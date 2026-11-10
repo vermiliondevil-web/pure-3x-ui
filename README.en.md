@@ -9,6 +9,14 @@
 
 A clean build of [3x-ui](https://github.com/MHSanaei/3x-ui) without ads or donation blocks.
 
+## ⚠️ Important Xray-core update (v26.11.9+)
+
+In November 2026, a significant Xray-core update was released with notable changes to transports and security. If you use this fork on a server, consider updating — but **read the official sources first** (XTLS/Xray-core release notes, discussions), **test on a separate VPS**, and make sure **client and server versions match**.
+
+**Why no details here:** the specific changes touch sensitive topics. Public discussion may draw unwanted attention to the project and its contributors. If you need to understand what changed — refer to the primary source and draw your own conclusions.
+
+**To update the core:** use the panel (Settings → Xray Updates) or the "Update" button. The `[8/8]` patch in `update.sh` preserves the selected core when the panel updates.
+
 > [!CAUTION]
 > **Do not use `dev-latest` / pre-release builds**
 >
