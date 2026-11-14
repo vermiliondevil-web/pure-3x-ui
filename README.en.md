@@ -9,13 +9,18 @@
 
 A clean build of [3x-ui](https://github.com/MHSanaei/3x-ui) without ads or donation blocks.
 
-## ⚠️ Important Xray-core update (v26.11.9+)
+### ⚠️ SNI must match the server's location
 
-In November 2026, a significant Xray-core update was released with notable changes to transports and security. If you use this fork on a server, consider updating — but **read the official sources first** (XTLS/Xray-core release notes, discussions), **test on a separate VPS**, and make sure **client and server versions match**.
+When setting up VLESS + Reality, **do not use** popular domains from the panel's default lists (e.g. `www.microsoft.com`, `www.google.com`, `api-maps.yandex.ru`) if your server is located in a different country.
 
-**Why no details here:** the specific changes touch sensitive topics. Public discussion may draw unwanted attention to the project and its contributors. If you need to understand what changed — refer to the primary source and draw your own conclusions.
+**Why:** DPI (TSPU) sees a TLS handshake with SNI `www.microsoft.com` arriving at the IP of a Finnish or German hosting provider. That is an **anomaly** — Microsoft does not host its services on random VPS instances. This combination of "foreign domain + foreign IP" is one of the easiest patterns to detect a proxy.
 
-**To update the core:** use the panel (Settings → Xray Updates) or the "Update" button. The `[8/8]` patch in `update.sh` preserves the selected core when the panel updates.
+**What to do:**
+- Choose an SNI that is **logically tied** to the server's location. If the server is in Finland, look for Finnish domains that support TLS 1.3 and H2. If in Germany — German domains.
+- Ideally, use a domain from the **same hosting provider or ASN** as your server (you can find one with a scanner like RealiTLScanner).
+- **Do not use** domains that are already heavily "burned" in Reality guides (ya.ru, vk.com, max.ru, etc.) — they are under extra scrutiny by TSPU.
+
+**How to check:** the `findsni.sh` utility or `RealiTLScanner` scans your server's subnet and finds domains that "live" nearby.
 
 > [!CAUTION]
 > **Do not use `dev-latest` / pre-release builds**
