@@ -22,6 +22,35 @@ When setting up VLESS + Reality, **do not use** popular domains from the panel's
 
 **How to check:** the `findsni.sh` utility or `RealiTLScanner` scans your server's subnet and finds domains that "live" nearby.
 
+
+### Вариант для английского README
+
+```markdown
+## 🖼️ Diagram: why SNI must match the server location
+
+Reality masks the connection as a regular HTTPS visit to the site specified in SNI. If the site and the server are in the **same infrastructure** (country, CDN, ASN) — it looks natural. If not — DPI sees an anomaly.
+
+```text
+🟢 CORRECT: SNI and server in the same region
+┌─────────────┐      TLS ClientHello       ┌─────────────────────┐
+│  Client     │ ──── (SNI: finnish.com) ──>│  Server in Finland  │
+│  in RU      │                            │  IP: 95.x.x.x       │
+└─────────────┘                            └─────────────────────┘
+                                                    │
+                                           DPI sees: "Finnish IP +
+                                           Finnish domain = normal"
+
+🔴 WRONG: SNI in USA, server in Finland
+┌─────────────┐      TLS ClientHello       ┌─────────────────────┐
+│  Client     │ ──── (SNI: usa-site.com) ─>│  Server in Finland  │
+│  in RU      │                            │  IP: 95.x.x.x       │
+└─────────────┘                            └─────────────────────┘
+                                                    │
+                                           DPI sees: "American 
+                                           domain on Finnish IP = 
+                                           suspicious"
+```
+
 > [!CAUTION]
 > **Do not use `dev-latest` / pre-release builds**
 >
