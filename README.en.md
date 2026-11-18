@@ -47,11 +47,45 @@ Reality masks the connection as a regular HTTPS visit to the site specified in S
                                            suspicious"
 ```
 
+## 🖼️ How VLESS + XHTTP + Reality Works
 
+```text
+┌──────────────┐          ┌──────────────────────────────────────┐          ┌──────────────┐
+│    Client    │          │             Server (VPS)             │          │   Internet   │
+│ (v2rayN etc.)│          │                                      │          │              │
+└──────┬───────┘          └──────────────────┬───────────────────┘          └──────┬───────┘
+       │                                     │                                     │
+       │ 1. TLS ClientHello (SNI: mask site) │                                     │
+       │ ───────────────────────────────────>│                                     │
+       │                                     │ 2. Reality verifies SNI             │
+       │                                     │    and returns a genuine            │
+       │ 3. TLS ServerHello                  │    certificate of the mask site     │
+       │ <───────────────────────────────────│                                     │
+       │                                     │                                     │
+       │ 4. VLESS Request (UUID + XHTTP)     │                                     │
+       │    + Flow (xtls-rprx-vision)*       │                                     │
+       │ ───────────────────────────────────>│                                     │
+       │                                     │ 5. What Flow (Vision) does:         │
+       │                                     │    • Masks "TLS-in-TLS" traffic     │
+       │                                     │      (adds random packet padding)   │
+       │                                     │    • Eliminates double encryption   │
+       │                                     │      after handshake (raw copy)     │
+       │                                     │                                     │
+       │                                     │ 6. Xray unpacks XHTTP and forwards  │
+       │                                     │    the request to the target        │
+       │                                     │ ───────────────────────────────────>│
+       │                                     │                                     │
+       │                                     │ 7. Response from target site        │
+       │                                     │ <───────────────────────────────────│
+       │                                     │                                     │
+       │ 8. Response to client (via XHTTP)   │                                     │
+       │ <───────────────────────────────────│                                     │
+       │                                     │                                     │
+```
 
-> **\*Примечание про Flow (`xtls-rprx-vision`) в XHTTP:**
+> **\*Note on Flow (`xtls-rprx-vision`) with XHTTP:**
 
-> В связке с **XHTTP** параметр Flow работает **только при включённом VLESS Encryption** (когда в панели и у клиента прописаны ключи `decryption`/`encryption`). Если VLESS Encryption не используется (`none`), поле Flow остаётся пустым — трафик защищается и маскируется средствами самого XHTTP.
+> When using **XHTTP**, Flow works **only if VLESS Encryption is enabled** (both server `decryption` and client `encryption` keys are configured). If VLESS Encryption is disabled (`none`), leave the Flow field empty — XHTTP handles traffic masking and protection on its own.
 
 
 > [!CAUTION]
