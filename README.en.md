@@ -87,6 +87,43 @@ Reality masks the connection as a regular HTTPS visit to the site specified in S
 
 > When using **XHTTP**, Flow works **only if VLESS Encryption is enabled** (both server `decryption` and client `encryption` keys are configured). If VLESS Encryption is disabled (`none`), leave the Flow field empty — XHTTP handles traffic masking and protection on its own.
 
+## 🚫 Why Standard WireGuard Gets Blocked (and How AmneziaWG & Reality Differ)
+
+Deep Packet Inspection (DPI) systems easily detect classic **WireGuard** by its rigid technical fingerprints (signatures), as it does not disguise itself as regular web traffic.
+
+```text
+┌──────────────┐          ┌───────────────────────────────┐          ┌──────────────┐
+│    Client    │          │         ISP / DPI System      │          │    Server    │
+└──────┬───────┘          └───────────────┬───────────────┘          └──────┬───────┘
+       │                                  │                                 │
+       │ 1. Standard WireGuard Handshake  │                                 │
+       │    • Protocol: Raw UDP           │                                 │
+       │    • Size: Exactly 148 bytes     │                                 │
+       │    • Header: 0x01 0x00 0x00      │                                 │
+       │ ────────────────────────────────>│                                 │
+       │                                  │ 2. DPI detects WG signature:    │
+       │                                  │    • No TLS or SNI              │
+       │                                  │    • Recognizable packet size   │
+       │                                  │    ❌ PACKET DROPPED            │
+       │       [ Connection Reset ]       │                                 │
+       │ < ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─│                                 │
+       │                                  │                                 │
+```
+
+### How Different Protocols Solve This
+
+* **AmneziaWG (UDP Obfuscation).** Modifies WireGuard itself by injecting random junk packets before the handshake, changing standard packet headers (`H1–H4`), and randomizing packet sizes. To DPI, the traffic no longer looks like WireGuard and resembles a generic UDP stream (like online gaming or VoIP). **Drawback:** If an ISP enforces strict filtering against all unknown UDP traffic (protocol whitelisting), AmneziaWG can still be blocked.
+* **VLESS + XHTTP + Reality (Full HTTPS Camouflage).** Instead of hiding VPN traffic as "random noise," it mimics a standard web browser opening a real third-party website (complete with a genuine TLS certificate and SNI). It continues working even on networks that block all non-standard UDP traffic.
+
+### DPI Comparison
+
+| Traffic Feature | Standard WireGuard | AmneziaWG | VLESS + XHTTP + Reality |
+| :--- | :--- | :--- | :--- |
+| **Transport** | Raw UDP | Obfuscated UDP | TCP / QUIC (HTTP/2, HTTP/3) |
+| **First Packet** | Strictly 148 bytes, fixed header | Randomized size + junk packets, custom headers | Standard TLS ClientHello with real SNI |
+| **Appearance** | Identifiable VPN protocol | Unknown encrypted UDP stream | Indistinguishable from visiting a regular HTTPS site |
+| **DPI Reaction** | Instant signature-based block | Passes (unless all unknown UDP is throttled/blocked) | Passes as legitimate web traffic |
+
 
 > [!CAUTION]
 > **Do not use `dev-latest` / pre-release builds**
