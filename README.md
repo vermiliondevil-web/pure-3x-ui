@@ -392,6 +392,65 @@ Reality маскирует соединение под обычный HTTPS-ви
 * **`disableCache: false`** — включает кэширование DNS-ответов в оперативной памяти Xray для ускорения повторных запросов.
 * **`disableFallback: false`** — разрешает автоматический переход (fallback) к резервному DNS-серверу из списка `servers`, если основной сервер не ответил или вернул ошибку. При значении `true` опрос резервных серверов полностью отключается.
 
+## 4. Маршрутизация DNS при использовании Cloudflare WARP
+
+Если на сервере настроен исходящий шлюз `warp` (для обхода капчи Google, доступа к ChatGPT и др.), важно, чтобы DNS-запросы для этих сервисов также резолвились корректно, а сам домен подключения к Cloudflare не зациклился.
+
+### Пример связки `dns` + `routing` для WARP
+
+```json
+{
+  "dns": {
+    "servers": [
+      {
+        "address": "https+local://1.1.1.1/dns-query",
+        "domains": [
+          "geosite:google",
+          "geosite:openai",
+          "geosite:netflix"
+        ]
+      },
+      "https+local://8.8.8.8/dns-query"
+    ],
+    "queryStrategy": "UseIPv4"
+  },
+  "routing": {
+    "domainStrategy": "IPIfNonMatch",
+    "rules": [
+      {
+        "type": "field",
+        "domain": [
+          "geosite:category-ads-all"
+        ],
+        "outboundTag": "block"
+      },
+      {
+        "type": "field",
+        "domain": [
+          "geosite:google",
+          "geosite:openai",
+          "geosite:netflix"
+        ],
+        "outboundTag": "warp"
+      },
+      {
+        "type": "field",
+        "ip": [
+          "geoip:private"
+        ],
+        "outboundTag": "block"
+      }
+    ]
+  }
+}
+```
+
+### Что делает `domainStrategy` в разделе Routing
+
+1. **`AsIs`** — проверяет только доменное имя, которое пришло от клиента. Не делает дополнительных DNS-запросов (самый быстрый режим, требует включённого `Sniffing`).
+2. **`IPIfNonMatch`** — если домен не попал ни под одно доменное правило, Xray сам делает DNS-запрос через свой модуль `dns`, получает IP-адрес и проверяет его по IP-правилам (`geoip:...`). **Оптимальный баланс скорости и точности.**
+3. **`IPOnDemand`** — всегда резолвит домен в IP перед проверкой правил. Создаёт лишнюю задержку при каждом новом соединении.
+
 
 > [!CAUTION]
 > ⚠️ **Не используйте `dev-latest` / pre-release сборки**
