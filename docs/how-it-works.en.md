@@ -242,21 +242,39 @@ Flexible Routing. Inside the 3x-ui panel, you can route either all traffic throu
 🚨 Why Egress via a VPS in Russia Fails (Even with DoH)
 If you use a Russian VPS as your final exit node, enabling DoH (DNS over HTTPS) will not prevent ISP block pages or null-routed IPs. Filtering (TSPU) occurs at the backbone level as traffic exits Russia—by inspecting the unencrypted SNI field and injecting forged packets.
 How TSPU Spoofs Responses on Egress from a Russian VPS
-text ┌──────────────┐ 1. Tunnel to Russia ┌─────────────────────────┐ 2. Outbound Request (SNI: google.com) ┌─────────────────────────┐ │ Client │ ───────────────────────────> │ VPS in Russia │ ──────────────────────────────────────────> │ Backbone TSPU Filter │ │ │ (Traffic reaches RU clean) │ (Attempts to access │ • DoH is blocked or bypassed │ (DPI inside Russia) │ └──────┬───────┘ │ the open internet) │ • Yet TLS ClientHello exposes SNI! │ │ │ └────────────┬────────────┘ └────────────┬────────────┘ │ │ │ │ │ 3. TSPU intercepts TLS via SNI: │ │ │ • Terminates real Google link (TCP RST) │ │ │ • Injects a FORGED packet pretending to be the site: │ │ │ "302 Redirect to block page" or null IP │ │ 4. Client receives block page │ <─────────────────────────────────────────────────────────────────────┤ │ <─────────────────────────────────────────────────┤ │ │ (Appears as if the site returned a block page) │ │
+```text
+┌──────────────┐       1. Tunnel to Russia     ┌─────────────────────────┐       2. Outbound Request (SNI: google.com)   ┌─────────────────────────┐
+│    Client    │ ───────────────────────────> │      VPS in Russia      │ ──────────────────────────────────────────> │   Backbone TSPU Filter  │
+│              │   (Traffic reaches RU clean) │   (Attempts to access   │    • DoH is blocked or bypassed             │   (DPI inside Russia)   │
+└──────┬───────┘                              │    the open internet)   │    • Yet TLS ClientHello exposes SNI!       │                         │
+       │                                      └────────────┬────────────┘                                             └────────────┬────────────┘
+       │                                                   │                                                                       │
+       │                                                   │ 3. TSPU intercepts TLS via SNI:                                       │
+       │                                                   │    • Terminates real Google link (TCP RST)                            │
+       │                                                   │    • Injects a FORGED packet pretending to be the site:               │
+       │                                                   │      "302 Redirect to block page" or null IP                          │
+       │ 4. Client receives block page                     │ <─────────────────────────────────────────────────────────────────────┤
+       │ <─────────────────────────────────────────────────┤                                                                       │
+       │    (Appears as if the site returned a block page) │                                                                       │
+```
 TCP Injection Packet Forgery Datagram
 ```text
 STEP 1: Russian VPS sends a normal request to the target site (DoH doesn't help because SNI is plaintext):
 +-------------------+-------------------+-------------------+-----------------------------------+
-| IPv4 Header | TCP Header | TLS ClientHello | SNI: "blocked-site.com" (PLAINTEXT)|
-| Russian VPS IP | Port 443 | (Session start) | (TSPU reads domain from SNI) |
+
+| IPv4 Header       | TCP Header        | TLS ClientHello   | SNI: "blocked-site.com" (PLAINTEXT)|
+| Russian VPS IP    | Port 443          | (Session start)   | (TSPU reads domain from SNI)      |
 +-------------------+-------------------+-------------------+-----------------------------------+
-▲
-└── TSPU detects restricted SNI
+                                                             ▲
+                                                             └── TSPU detects restricted SNI
+
 STEP 2: TSPU instantly generates and injects a spoofed reply faster than the real server:
 +-------------------+-------------------+-------------------+-----------------------------------+
-| IPv4 Header | TCP Header | Fake HTTP / TLS | Spoofed: Block Page IP / TCP Reset|
-| Spoofed: Site IP | Port 443 | (Reply from TSPU) | (Browser loads the block page) |
+
+| IPv4 Header       | TCP Header        | Fake HTTP / TLS   | Spoofed: Block Page IP / TCP Reset|
+| Spoofed: Site IP  | Port 443          | (Reply from TSPU) | (Browser loads the block page)    |
 +-------------------+-------------------+-------------------+-----------------------------------+
+
 ```
 The Only Working Solution ("RU Bridge → Foreign VPS" Cascade)
 A Russian VPS must act strictly as a blind relay (Dock / Bridge), without ever resolving DNS or opening websites itself. All traffic passing through it stays sealed inside an encrypted VLESS + XHTTP + Reality container all the way to a foreign server.
