@@ -7,7 +7,7 @@
 
 ## [How It Works]
 ## [Known Limitations]
-## [Security](docs/security.md)
+## [Security]
 ## [Regional Hosting Provider Lockouts]
 ## [Thoughts on the Original Project]
 ## [About the Project and Build Automation]
