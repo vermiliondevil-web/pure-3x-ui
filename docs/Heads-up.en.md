@@ -46,7 +46,6 @@ changes its process, forks will exist. This is not a "split." It is
 **If you use upstream — audit it. If you are a contributor —
 own your code. If you are the author — listen to the community.**
 
-
 ### Update Policy
 
 - Critical security fix (CVE).
@@ -55,8 +54,6 @@ own your code. If you are the author — listen to the community.**
 - Personal necessity.
 
 Niche fixes (multi-user Shadowsocks, node sync, MTProto, vmess import) are **skipped** unless needed.
-
-
 
 ## Policy Regarding Sponsor Commits
 
@@ -118,6 +115,7 @@ tool, and we are grateful to the author for the code. However, we believe that:
    "stripping out what is dangerous and documenting why."
 
 **We urge panel operators:**
+
 - **Check where your panel connects (`tcpdump`, `strings`).**
 - **Do not update to every upstream release without auditing it first.**
 - **If you spot an issue — report it upstream, do not stay silent.**

@@ -61,34 +61,34 @@ To keep your VPS and control panel invisible to network scanners (Shodan/Censys)
 
 ## 1. Hiding the Panel Web Interface (3x-ui)
 
-* **Close the panel port in your firewall.** The web interface (port `2053` or any other) must not be exposed to the internet by IP. Externally, only the Xray port (`443`) and SSH port should be accessible.
-* **Access the panel only via an SSH tunnel.** Forward the panel port locally to your machine:
+- **Close the panel port in your firewall.** The web interface (port `2053` or any other) must not be exposed to the internet by IP. Externally, only the Xray port (`443`) and SSH port should be accessible.
+- **Access the panel only via an SSH tunnel.** Forward the panel port locally to your machine:
   ```bash
   ssh -L 2053:127.0.0.1:2053 user@your-vps-ip
   ```
   Afterward, open the panel in your browser at `http://127.0.0.1:2053`, leaving the port completely invisible from the outside.
-* **Use a random path (Web Base Path).** Set a long random prefix of 16–24 characters in the panel settings (e.g., `/x9kLm2pQ8vR4tW7z/`) so that random requests do not return the 3x-ui login page.
-* **No plain HTTP.** If you expose the panel via a domain, always use a reverse proxy (Nginx / Caddy) with a valid TLS certificate. Logging in over plain HTTP transmits your password and cookies in cleartext.
+- **Use a random path (Web Base Path).** Set a long random prefix of 16–24 characters in the panel settings (e.g., `/x9kLm2pQ8vR4tW7z/`) so that random requests do not return the 3x-ui login page.
+- **No plain HTTP.** If you expose the panel via a domain, always use a reverse proxy (Nginx / Caddy) with a valid TLS certificate. Logging in over plain HTTP transmits your password and cookies in cleartext.
 
 ## 2. Network Masquerading and SNI Selection (Reality)
 
-* **Choose a "neighboring" decoy site.** The domain for Reality (SNI) should be located in the same country or data center as your VPS, support **TLS 1.3** and **HTTP/2**, and not be blocked in the client's country. A geographic mismatch between the server IP and the decoy site (e.g., a VPS in the Netherlands with a Russian SNI) creates latency anomalies for DPI.
-* **Avoid popular SNIs from public guides.** Do not use `google.com`, `microsoft.com`, `apple.com`, or `yahoo.com` — these domains are under heightened monitoring. Find a small local website hosted on the same provider (such as a local university, museum, or regional store).
-* **Do not mix Reality and websites on the same port.** If Reality is running on port `443` with a third-party SNI, do not point your own control panel domain to the same IP without separating them via an SNI router (Nginx stream).
+- **Choose a "neighboring" decoy site.** The domain for Reality (SNI) should be located in the same country or data center as your VPS, support **TLS 1.3** and **HTTP/2**, and not be blocked in the client's country. A geographic mismatch between the server IP and the decoy site (e.g., a VPS in the Netherlands with a Russian SNI) creates latency anomalies for DPI.
+- **Avoid popular SNIs from public guides.** Do not use `google.com`, `microsoft.com`, `apple.com`, or `yahoo.com` — these domains are under heightened monitoring. Find a small local website hosted on the same provider (such as a local university, museum, or regional store).
+- **Do not mix Reality and websites on the same port.** If Reality is running on port `443` with a third-party SNI, do not point your own control panel domain to the same IP without separating them via an SNI router (Nginx stream).
 
 ## 3. Key and Subscription Hygiene
 
-* **Disable the Subscription server.** If you only have 3–5 personal users, it is safer to disable the subscription service entirely in panel settings and distribute keys (`vless://...`) manually. An open subscription port is easily fingerprinted by scanners via its distinct HTTP headers.
-* **Do not test your server in public online checkers.** Never paste your active `vless://` keys and server IP into dubious web checkers or Telegram bots — many of them harvest lists of working nodes.
-* **Use a telemetry-free fork.** This clean build strips background requests to sponsor servers and update checks that could expose the server via recognizable outbound TLS SNI.
+- **Disable the Subscription server.** If you only have 3–5 personal users, it is safer to disable the subscription service entirely in panel settings and distribute keys (`vless://...`) manually. An open subscription port is easily fingerprinted by scanners via its distinct HTTP headers.
+- **Do not test your server in public online checkers.** Never paste your active `vless://` keys and server IP into dubious web checkers or Telegram bots — many of them harvest lists of working nodes.
+- **Use a telemetry-free fork.** This clean build strips background requests to sponsor servers and update checks that could expose the server via recognizable outbound TLS SNI.
 
 ## 4. Baseline Server OS Security
 
-| Parameter | Recommended Setting | Why It Matters |
-| :--- | :--- | :--- |
-| **SSH Access** | SSH key only (`PasswordAuthentication no`), non-standard port | Protects against automated password brute-forcing by bots |
-| **ICMP (Ping)** | Disabled in firewall (UFW / iptables) | Prevents the server from responding to mass subnet scans |
-| **Third-party software** | No torrents, scrapers, or public services on the same VPS | Prevents abuse complaints and IP blacklisting by the hoster |
+| Parameter                | Recommended Setting                                           | Why It Matters                                              |
+| :----------------------- | :------------------------------------------------------------ | :---------------------------------------------------------- |
+| **SSH Access**           | SSH key only (`PasswordAuthentication no`), non-standard port | Protects against automated password brute-forcing by bots   |
+| **ICMP (Ping)**          | Disabled in firewall (UFW / iptables)                         | Prevents the server from responding to mass subnet scans    |
+| **Third-party software** | No torrents, scrapers, or public services on the same VPS     | Prevents abuse complaints and IP blacklisting by the hoster |
 
 > [!CAUTION]
 > ⚠️ **Do not use `dev-latest` / pre-release builds**

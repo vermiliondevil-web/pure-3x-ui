@@ -23,6 +23,7 @@ may **block** write access. The solution is a custom drop-in:
 [Service]
 ReadWritePaths=/your/path
 ```
+
 Or — do not use custom paths (keep the defaults).
 
 ### Xray-core 26.10.10 — TLS

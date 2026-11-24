@@ -175,10 +175,10 @@ The original 3x-ui is developed by a **community of 310+ contributors**. Any PR 
 
 ### What Is Checked in This Fork
 
-| What Is Checked | How |
-|---|---|
-| Sponsor code | `scripts/remove-ads.sh` replaces `sponsor.go` with a stub |
-| Ad links | Removed from `AppSidebar`, `LoginPage`, and `routes` |
-| Telemetry | Inspected via `strings` on the compiled binary |
-| Hidden domains | `grep` across the codebase for `http://` and `https://` |
-| New dependencies | Manual review of `go.mod` and `package.json` |
+| What Is Checked  | How                                                       |
+| ---------------- | --------------------------------------------------------- |
+| Sponsor code     | `scripts/remove-ads.sh` replaces `sponsor.go` with a stub |
+| Ad links         | Removed from `AppSidebar`, `LoginPage`, and `routes`      |
+| Telemetry        | Inspected via `strings` on the compiled binary            |
+| Hidden domains   | `grep` across the codebase for `http://` and `https://`   |
+| New dependencies | Manual review of `go.mod` and `package.json`              |
