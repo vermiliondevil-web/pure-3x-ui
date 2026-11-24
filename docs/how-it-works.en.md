@@ -315,15 +315,19 @@ Request Processing Flow in Xray
 
 ```
 
-3. DNS Server Types in Xray Settings
+2. DNS Server Types in Xray Settings
 Under Xray Settings → DNS (or in the raw JSON configuration), the following resolution protocols are supported:
-Entry Format	Protocol	Features & Use Cases
-https://1.1.1	DoH (DNS over HTTPS)	Encrypts DNS queries over HTTPS. Routes through the default outbound (respects routing rules). Recommended for a foreign VPS.
-https+local://8.8.8.8/dns-query	DoH Local	Sends DoH queries directly via the server's network interface (freedom), bypassing Xray routing rules. Useful for preventing routing loops when WARP starts up.
-tls://1.1.1.1	DoT (DNS over TLS)	Encrypted DNS over port 853. Reliable, though occasionally blocked by strict hosting provider firewalls.
-localhost	VPS System DNS	Uses the server's own /etc/resolv.conf. Never use on a VPS in Russia (causes IP spoofing to TSPU block pages).
-fakedns	FakeDNS	Assigns the client a synthetic local IP from the 198.18.0.0/15 pool while mapping "IP ↔ Domain" in memory. Eliminates client-side latency from real DNS lookups.
-4. Baseline Secure DNS Configuration (for a Foreign VPS)
+
+| Entry Format | Protocol | Features & Use Cases |
+| :--- | :--- | :--- |
+| `https://1.1.1` | **DoH** (DNS over HTTPS) | Encrypts DNS queries over HTTPS. Routes through the default `outbound` (respects routing rules). **Recommended for a foreign VPS.** |
+| `https+local://8.8.8.8/dns-query` | **DoH Local** | Sends DoH queries directly via the server's network interface (`freedom`), bypassing Xray routing rules. Useful for preventing routing loops when WARP starts up. |
+| `tls://1.1.1.1` | **DoT** (DNS over TLS) | Encrypted DNS over port 853. Reliable, though occasionally blocked by strict hosting provider firewalls. |
+| `localhost` | **VPS System DNS** | Uses the server's own `/etc/resolv.conf`. **Never use on a VPS in Russia** (causes IP spoofing to TSPU block pages). |
+| `fakedns` | **FakeDNS** | Assigns the client a synthetic local IP from the `198.18.0.0/15` pool while mapping "IP ↔ Domain" in memory. Eliminates client-side latency from real DNS lookups. |
+
+
+3. Baseline Secure DNS Configuration (for a Foreign VPS)
 On a foreign server, there is no need to split queries by country — all external domains should be resolved via encrypted DoH servers with automatic failover.
 json { "dns": { "servers": [ "https+local://1.1.1.1/dns-query", "https+local://8.8.8.8/dns-query" ], "queryStrategy": "UseIPv4", "disableCache": false, "disableFallback": false } }
 Explanation of Key Parameters
