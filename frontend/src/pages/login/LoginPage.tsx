@@ -27,7 +27,6 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { HttpUtil, LanguageManager } from '@/utils';
 import { FormField, rhfZodValidate } from '@/components/form/rhf';
 import { setMessageInstance } from '@/utils/messageBus';
-import SponsorSlot from '@/components/sponsor/SponsorSlot';
 import { pauseAnimationsUntilLeave, themeModeKey, useTheme } from '@/hooks/useTheme';
 import { LoginFormSchema, TwoFactorCodeSchema, type LoginFormValues } from '@/schemas/login';
 import './LoginPage.css';
