@@ -149,7 +149,7 @@ Traffic is encapsulated inside a standard HTTPS request over a genuine TLS conne
 │ └── Inside: UUID, Flow (Vision), & traffic
 └── DPI verifies cert & SNI → SEES A REGULAR BROWSER
 ```
-🛡️ Why XHTTP + Reality Cannot Be Blocked Without Shutting Down the Entire Internet
+## 🛡️ Why XHTTP + Reality Cannot Be Blocked Without Shutting Down the Entire Internet
 At the network packet level, VLESS + XHTTP + Reality traffic is 100% identical to visiting a regular HTTPS website (such as an online bank, search engine, or e-commerce marketplace).
 OUTER SHELL (Visible to ISP & DPI) — Identical to any HTTPS website:
 ```text
@@ -178,7 +178,7 @@ Certificate	Genuine cert from example.com	Genuine cert from example.com	Identica
 Data Payload	Encrypted HTTP/2	Encrypted HTTP/2 (XHTTP)	Unreadable without keys
 Bottom Line: The ISP has zero technical indicators (signatures) to distinguish an XHTTP packet from a legitimate HTTPS request. The only way to block such a connection is to shut down port 443 entirely (all HTTPS traffic), which effectively means disconnecting the entire internet.
 
-🌐 How VLESS + XHTTP + Reality + WARP Works
+## 🌐 How VLESS + XHTTP + Reality + WARP Works
 
 In this architecture, Reality + XHTTP handles secure ingress to your VPS (protecting against ISP DPI), while Cloudflare WARP acts as an outbound gateway on the server itself, masking your hosting provider's IP address from destination websites.
 1. Traffic Flow Diagram (Routing)
@@ -197,8 +197,9 @@ In this architecture, Reality + XHTTP handles secure ingress to your VPS (protec
                                                                                                               │  & other sites)│
                                                                                                               └────────────────┘
 ```
-3. Packet Transformation Datagram (Step by Step)
+## 3. Packet Transformation Datagram (Step by Step)
 The packet changes its "wrapping" twice: upon entering the VPS (where ISP protection is stripped away) and upon exiting the VPS (where the Cloudflare WARP tunnel is applied).
+
 ```text
 STAGE 1: From Client to Your VPS (Visible to your ISP / DPI)
 +-------------------+-------------------+-------------------+-----------------------------------+
@@ -239,7 +240,7 @@ Bypassing ISP DPI (XHTTP + Reality). Using standard WARP directly from a phone o
 Avoiding CAPTCHAs and IP Bans (WARP Outbound). Many websites (Google, ChatGPT, Netflix, banking portals) block datacenter (VPS) IP addresses or bombard them with CAPTCHAs. Routing egress traffic through WARP provides a trusted Cloudflare IP address.
 Flexible Routing. Inside the 3x-ui panel, you can route either all traffic through WARP or only specific domains (geosite:google, geosite:openai, etc.), letting the rest go directly through your VPS.
 
-🚨 Why Egress via a VPS in Russia Fails (Even with DoH)
+## 🚨 Why Egress via a VPS in Russia Fails (Even with DoH)
 If you use a Russian VPS as your final exit node, enabling DoH (DNS over HTTPS) will not prevent ISP block pages or null-routed IPs. Filtering (TSPU) occurs at the backbone level as traffic exits Russia—by inspecting the unencrypted SNI field and injecting forged packets.
 How TSPU Spoofs Responses on Egress from a Russian VPS
 ```text
@@ -288,9 +289,9 @@ A Russian VPS must act strictly as a blind relay (Dock / Bridge), without ever r
                                                   └─────────────────────────┘                                  └─────────────────────────┘
 ```
 
-🧭 Technical Documentation: DNS Routing in 3x-ui (Xray-core)
+## 🧭 Technical Documentation: DNS Routing in 3x-ui (Xray-core)
 Proper DNS configuration in 3x-ui is critical for preventing DNS leaks, protecting against ISP-level IP spoofing (TSPU), and accurately splitting traffic (Split Tunneling) across direct egress, WARP, and ad-blocking outbounds.
-1. How DNS Works Inside Xray-core
+## 1. How DNS Works Inside Xray-core
 Unlike a standard OS system resolver, Xray-core includes a built-in DNS server (dns in the JSON configuration). It intercepts domain queries and decides which IP address to return or which outbound gateway should handle the request.
 Request Processing Flow in Xray
 
@@ -315,7 +316,7 @@ Request Processing Flow in Xray
 
 ```
 
-2. DNS Server Types in Xray Settings
+## 2. DNS Server Types in Xray Settings
 Under Xray Settings → DNS (or in the raw JSON configuration), the following resolution protocols are supported:
 
 | Entry Format | Protocol | Features & Use Cases |
@@ -327,7 +328,7 @@ Under Xray Settings → DNS (or in the raw JSON configuration), the following re
 | `fakedns` | **FakeDNS** | Assigns the client a synthetic local IP from the `198.18.0.0/15` pool while mapping "IP ↔ Domain" in memory. Eliminates client-side latency from real DNS lookups. |
 
 
-3. Baseline Secure DNS Configuration (for a Foreign VPS)
+## 3. Baseline Secure DNS Configuration (for a Foreign VPS)
 On a foreign server, there is no need to split queries by country — all external domains should be resolved via encrypted DoH servers with automatic failover.
 ```json
 {
@@ -350,7 +351,7 @@ On a foreign server, there is no need to split queries by country — all extern
 * **`disableCache: false`** — Enables in-memory DNS response caching in Xray to speed up repeated lookups.
 * **`disableFallback: false`** — Allows automatic fallback to the backup DNS server in the servers list if the primary resolver fails or times out. When set to true, fallback servers are never queried.
    
-4. DNS Routing When Using Cloudflare WARP
+## 4. DNS Routing When Using Cloudflare WARP
 If your server uses a warp outbound gateway (to bypass Google CAPTCHAs, access ChatGPT, etc.), DNS queries for those services must also resolve properly without causing Cloudflare's own endpoint domain to loop.
 Example dns + routing Configuration for WARP
 ```json
@@ -399,12 +400,12 @@ Example dns + routing Configuration for WARP
   }
 }
 ```
-## How domainStrategy Works in Routing
+**`How domainStrategy Works in Routing`**
 1. **`AsIs`** — Inspects only the domain name sent by the client without performing additional DNS lookups (fastest mode; requires Sniffing to be enabled).
 2. **`IPIfNonMatch`** — If a domain does not match any domain-based rule, Xray resolves it via its dns module and checks the resulting IP against IP-based rules (geoip:...). **Best balance between speed and accuracy.**.
 3. **`IPOnDemand`** — Always resolves the domain to an IP before evaluating rules. Introduces extra latency on every new connection.
 
-5. Specifics for Cascade Setups (RU Bridge → Foreign VPS)
+## 5. Specifics for Cascade Setups (RU Bridge → Foreign VPS)
 When using an intermediate relay server in Russia (Bridge / Relay), follow these strict rules:
 
     Do not configure (or use) the dns module on the Russian VPS. Incoming traffic (VLESS + XHTTP + Reality or Dokodemo-door) must be forwarded to the outbound tunnel toward the foreign server as-is (byte-for-byte) without attempting to decrypt TLS or resolve domains inside Russia.
