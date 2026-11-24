@@ -151,22 +151,24 @@ Traffic is encapsulated inside a standard HTTPS request over a genuine TLS conne
 ```
 🛡️ Why XHTTP + Reality Cannot Be Blocked Without Shutting Down the Entire Internet
 At the network packet level, VLESS + XHTTP + Reality traffic is 100% identical to visiting a regular HTTPS website (such as an online bank, search engine, or e-commerce marketplace).
-```text
 OUTER SHELL (Visible to ISP & DPI) — Identical to any HTTPS website:
+```text
 +-------------------+-------------------+-------------------+-----------------------------------+
-| IPv4 / IPv6 | TCP Header | TLS 1.3 Header | TLS Application Data |
-| Server IP | Port 443 (HTTPS) | SNI: decoy site | [ ENCRYPTED WITH REALITY KEY ] |
+
+| IPv4 / IPv6       | TCP Header        | TLS 1.3 Header    | TLS Application Data              |
+| Server IP         | Port 443 (HTTPS)  | SNI: decoy site   | [ ENCRYPTED WITH REALITY KEY ]    |
 +-------------------+-------------------+-------------------+-----------------------------------+
-▲ ▲
-│ └── DPI CANNOT SEE INSIDE:
-│ no access to HTTP headers
-└── Genuine certificate & browser TLS fingerprint
+                                         ▲                   ▲
+                                         │                   └── DPI CANNOT SEE INSIDE:
+                                         │                       no access to HTTP headers
+                                         └── Genuine certificate & browser TLS fingerprint
+
 INNER PAYLOAD (Visible only to your server after TLS decryption):
-┌─────────────────────────────────┐
-│ HTTP/2 or HTTP/3 (POST / GET) │
-│ └── VLESS (UUID + Flow) │
-│ └── Your actual traffic │
-└─────────────────────────────────┘
+                                                             ┌─────────────────────────────────┐
+                                                             │ HTTP/2 or HTTP/3 (POST / GET)   │
+                                                             │   └── VLESS (UUID + Flow)       │
+                                                             │         └── Your actual traffic │
+                                                             └─────────────────────────────────┘
 ```
 ISP Filter (DPI) Logic
 Packet Comparison	Visiting the Decoy Site Normally	Connecting via XHTTP + Reality	DPI Conclusion
