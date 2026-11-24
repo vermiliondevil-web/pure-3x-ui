@@ -177,7 +177,9 @@ TLS Handshake (SNI)	example.com	example.com	Identical
 Certificate	Genuine cert from example.com	Genuine cert from example.com	Identical
 Data Payload	Encrypted HTTP/2	Encrypted HTTP/2 (XHTTP)	Unreadable without keys
 Bottom Line: The ISP has zero technical indicators (signatures) to distinguish an XHTTP packet from a legitimate HTTPS request. The only way to block such a connection is to shut down port 443 entirely (all HTTPS traffic), which effectively means disconnecting the entire internet.
+
 🌐 How VLESS + XHTTP + Reality + WARP Works
+
 In this architecture, Reality + XHTTP handles secure ingress to your VPS (protecting against ISP DPI), while Cloudflare WARP acts as an outbound gateway on the server itself, masking your hosting provider's IP address from destination websites.
 1. Traffic Flow Diagram (Routing)
 text ┌──────────────┐ 1. XHTTP + Reality ┌───────────────────────────┐ 2. WireGuard (WARP) ┌────────────────┐ │ Client │ ─────────────────────────────> │ Your Server (VPS) │ ──────────────────────────────> │ Cloudflare │ │ (v2rayN etc.)│ (Masqueraded as HTTPS site) │ │ (Tunnel from VPS to CF) │ WARP Network │ └──────────────┘ │ ┌─────────────────────┐ │ └───────┬────────┘ │ │ Xray-core │ │ │ │ │ 1. Decrypts │ │ │ 3. Egress to web │ │ Reality/XHTTP │ │ │ with a clean IP │ │ 2. Routes traffic │ │ ▼ │ │ to WARP Outbound│ │ ┌────────────────┐ │ └─────────────────────┘ │ │ Target Website │ └───────────────────────────┘ │ (Google, ChatGPT│ │ & other sites)│ └────────────────┘
