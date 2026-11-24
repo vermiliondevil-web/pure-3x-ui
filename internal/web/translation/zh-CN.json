@@ -128,7 +128,11 @@
     "openMenu": "打开菜单",
     "pinSidebar": "固定侧边栏",
     "unpinSidebar": "取消固定侧边栏",
-    "subFormats": "Sub Formats"
+    "subFormats": "Sub Formats",
+    "themeLight": "浅色",
+    "themeDark": "深色",
+    "themeUltraDark": "极致深色",
+    "themeSystem": "跟随系统"
   },
   "pages": {
     "login": {
@@ -442,6 +446,8 @@
       "importInbound": "导入入站规则",
       "periodicTrafficResetTitle": "流量重置",
       "periodicTrafficResetDay": "每月重置日",
+      "preserveClientTraffic": "保留客户端用量",
+      "preserveClientTrafficHelp": "开启后，入站定时重置只清零本入站的流量。用户在所有节点上的累计用量会保留，按用户自己的周期重置。\n\n关闭后，本入站定时重置时，也会清零关联用户在所有节点上的累计用量。",
       "periodicTrafficReset": {
         "never": "从不",
         "daily": "每日",
@@ -856,6 +862,7 @@
       "has": "拥有",
       "hasNot": "不拥有",
       "actions": "操作",
+      "columns": "列",
       "totalGB": "流量上限 (GB)",
       "totalGBDesc": "该客户端的流量配额。0 = 不限制。",
       "expiryTime": "过期时间",
@@ -1109,6 +1116,11 @@
       "removeFromGroupResult": "已从 {name} 移除 {count} 个客户端。"
     },
     "nodes": {
+      "restartXray": "重启 Xray",
+      "restartPanel": "重启面板",
+      "restartConfirmTitle": "重启 {name}？",
+      "restartXrayContent": "此节点上活跃的 Xray 连接将会中断。",
+      "restartPanelContent": "节点面板和订阅服务将重启，并可能暂时不可用。需要节点上的 node-admin 或 admin API 令牌。",
       "addNode": "添加节点",
       "editNode": "编辑节点",
       "totalNodes": "节点总数",
@@ -1178,6 +1190,8 @@
         "xrayStopped": "已停止"
       },
       "toasts": {
+        "xrayRestarted": "已重启节点上的 Xray。",
+        "panelRestartAccepted": "已接受面板重启请求。节点可能暂时不可用。",
         "list": "加载节点失败",
         "obtain": "加载节点失败",
         "add": "添加节点",
@@ -1296,6 +1310,13 @@
       "tgNotifyLoginDesc": "当有人试图登录你的面板时显示用户名、IP 地址和时间",
       "sessionMaxAge": "会话时长",
       "sessionMaxAgeDesc": "保持登录状态的时长（单位：分钟）",
+      "publicIpRefresh": "公网 IP 刷新",
+      "publicIpRefreshDesc": "面板通过外部服务重新检测公网 IP 的间隔。0 表示仅检测一次，不再刷新。（单位：分钟）",
+      "publicIpv6Detect": "检测公网 IPv6",
+      "publicIpv6DetectDesc": "仅有 IPv4 的服务器请关闭，以跳过所有 IPv6 查询。",
+      "publicIpv4Override": "手动指定公网 IPv4",
+      "publicIpv6Override": "手动指定公网 IPv6",
+      "publicIpOverrideDesc": "使用此地址而不进行检测，不会为其发起任何外部查询。留空则自动检测。",
       "expireTimeDiff": "到期通知阈值",
       "expireTimeDiffDesc": "达到此阈值时，将收到有关到期时间的通知（单位：天）",
       "trafficDiff": "流量耗尽阈值",
@@ -2008,6 +2029,7 @@
         "localIpPlaceholder": "本地 IP",
         "dialerProxyPlaceholder": "选择要串联的出站",
         "dialerProxyHint": "让此出站通过另一个出站（按标签）拨号，以建立代理链。留空则直接连接。",
+        "dialerProxyMissing": "没有带此标签的出站可供串联。",
         "targetStrategyHint": "连接前如何解析目标域名：AsIs（默认）原样发送，UseIP… 解析失败时回退，ForceIP… 必须解析成功。",
         "addressRequired": "地址为必填项",
         "portRequired": "端口为必填项",
