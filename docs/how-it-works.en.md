@@ -202,29 +202,35 @@ The packet changes its "wrapping" twice: upon entering the VPS (where ISP protec
 ```text
 STAGE 1: From Client to Your VPS (Visible to your ISP / DPI)
 +-------------------+-------------------+-------------------+-----------------------------------+
-| IPv4 / IPv6 | TCP Header | TLS 1.3 Header | Encrypted Application Data |
-| Your VPS IP | Port 443 (HTTPS) | SNI: decoy site | [HTTP/2 XHTTP] -> [VLESS + Data] |
+
+| IPv4 / IPv6       | TCP Header        | TLS 1.3 Header    | Encrypted Application Data        |
+| Your VPS IP       | Port 443 (HTTPS)  | SNI: decoy site   | [HTTP/2 XHTTP] -> [VLESS + Data]  |
 +-------------------+-------------------+-------------------+-----------------------------------+
-▲
-└── ISP sees only a visit to a normal HTTPS website. Your actual request is encrypted inside.
-```
+                                         ▲
+                                         └── ISP sees only a visit to a normal HTTPS website.
+                                             Your actual request is encrypted inside.
+
 STAGE 2: Inside Your VPS (Xray-core routes the data)
-[ Decrypted User Request ] ──> Routing Rule (e.g., for Google / OpenAI / all traffic)
-└── Forwarded to Outbound: warp (WireGuard / MASQUE)
+  [ Decrypted User Request ] ──> Routing Rule (e.g., for Google / OpenAI / all traffic)
+                                     └── Forwarded to Outbound: warp (WireGuard / MASQUE)
+
 STAGE 3: From Your VPS to Cloudflare Network (Visible to your VPS hoster)
-```text
 +-------------------+-------------------+-------------------+-----------------------------------+
-| IPv4 / IPv6 | UDP Header | WARP / WireGuard | Encrypted Payload |
-| Cloudflare IP | Port 2408 (UDP) | Tunnel header | [Your request to target site] |
+
+| IPv4 / IPv6       | UDP Header        | WARP / WireGuard  | Encrypted Payload                 |
+| Cloudflare IP     | Port 2408 (UDP)   | Tunnel header     | [Your request to target site]     |
 +-------------------+-------------------+-------------------+-----------------------------------+
-▲
-└── Foreign VPS providers do not block WireGuard, so WARP runs at full speed.
-```
+                                         ▲
+                                         └── Foreign VPS providers do not block WireGuard,
+                                             so WARP runs at full speed.
+
 STAGE 4: From Cloudflare to Target Website (Visible to the website itself)
 +-------------------+-------------------+-------------------+-----------------------------------+
-| IPv4 / IPv6 | TCP Header | TLS 1.3 Header | Request to Website |
-| Clean CF WARP IP | Port 443 | SNI: target site | (Site sees you as a normal user) |
+
+| IPv4 / IPv6       | TCP Header        | TLS 1.3 Header    | Request to Website                |
+| Clean CF WARP IP  | Port 443          | SNI: target site  | (Site sees you as a normal user)  |
 +-------------------+-------------------+-------------------+-----------------------------------+
+
 ```
 Why Use This Setup?
 
