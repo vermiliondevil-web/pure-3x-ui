@@ -20,30 +20,6 @@
 
 Чистая сборка [3x-ui](https://github.com/MHSanaei/3x-ui) без рекламы и донат-блоков.
 
-
-
-## Отслеживание upstream-релизов
-
-Этот форк **не обновляется** на каждый релиз upstream. Ниже — что выходило, что взято и почему.
-
-| Дата | Upstream | Что в нём | Решение |
-|------|----------|-----------|---------|
-| 2026-10-10 | v3.10.0 | MASQUE, WARP modal, Xray 26.10.10, systemd sandbox | ✅ взято (боевой + тестовый) |
-| 2026-10-13 | v3.10.2 | Shadowsocks hot apply, node sync load, vmess import, MTProto limit, sponsor SNI fix, Windows 3x-ui.exe | ❌ пропущено |
-
-### Почему v3.10.2 пропущен
-
-- **Shadowsocks hot apply** — только для multi-user Shadowsocks. Не используется.
-- **Node sync load** — только для многонодовых сетапов. Только мастер.
-- **vmess link import** — только при импорте vmess-ссылок. Не используется.
-- **MTProto handshake limit** — только для MTProto. Не используется.
-- **Sponsor SNI fix** — спонсоры вырезаны, неактуально.
-- **Windows 3x-ui.exe** — сборка для Linux, неактуально.
-- **Core crash reports** — полезно, но не критично.
-
----
-
-
 ## Установка
 
 ### Основной способ (рекомендуется)
