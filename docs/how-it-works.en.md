@@ -127,3 +127,25 @@ The packet begins with a plaintext, fixed header. DPI reads the first 4 bytes an
                                          ▲
                                          └── DPI sees rigid signature & 148 B size → BLOCK
 ```
+2. AmneziaWG (Obfuscated UDP Datagram)
+Before establishing a connection, "junk" packets (Jc) are sent, while the handshake header itself is replaced with a random value (H1) and padded with a random tail (S1).
+```text
+[ Junk packet 1 (random bytes, 64 B) ] ──> [ Junk packet 2 (random bytes, 112 B) ] ──>
++-------------------+-------------------+-------------------+-------------------+---------------+
+| IPv4 / IPv6 | UDP Header | Custom H1 (4 B) | Encrypted Payload | Random Junk |
+| Header (20 B) | (8 bytes) | e.g.: 0x8A3F19C2 | (144 bytes) | (S1 bytes) |
++-------------------+-------------------+-------------------+-------------------+---------------+
+▲
+└── No known signature; packet size varies every time
+```
+3. VLESS + XHTTP + Reality (TCP/TLS Packet)
+Traffic is encapsulated inside a standard HTTPS request over a genuine TLS connection. From the ISP's perspective, it is simply a visit to the masquerade site.
+```text
++-------------------+-------------------+-------------------+-----------------------------------+
+| IPv4 / IPv6 | TCP Header | TLS 1.3 Record | Encrypted Application Data |
+| Header (20 B) | (20 bytes) | SNI: decoy site | [HTTP/2 POST] -> [VLESS + Data] |
++-------------------+-------------------+-------------------+-----------------------------------+
+▲ ▲
+│ └── Inside: UUID, Flow (Vision), & traffic
+└── DPI verifies cert & SNI → SEES A REGULAR BROWSER
+```
