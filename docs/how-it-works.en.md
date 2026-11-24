@@ -353,12 +353,56 @@ On a foreign server, there is no need to split queries by country — all extern
 4. DNS Routing When Using Cloudflare WARP
 If your server uses a warp outbound gateway (to bypass Google CAPTCHAs, access ChatGPT, etc.), DNS queries for those services must also resolve properly without causing Cloudflare's own endpoint domain to loop.
 Example dns + routing Configuration for WARP
-json { "dns": { "servers": [ { "address": "https+local://1.1.1.1/dns-query", "domains": [ "geosite:google", "geosite:openai", "geosite:netflix" ] }, "https+local://8.8.8.8/dns-query" ], "queryStrategy": "UseIPv4" }, "routing": { "domainStrategy": "IPIfNonMatch", "rules": [ { "type": "field", "domain": [ "geosite:category-ads-all" ], "outboundTag": "block" }, { "type": "field", "domain": [ "geosite:google", "geosite:openai", "geosite:netflix" ], "outboundTag": "warp" }, { "type": "field", "ip": [ "geoip:private" ], "outboundTag": "block" } ] } }
-How domainStrategy Works in Routing
-
-    AsIs — Inspects only the domain name sent by the client without performing additional DNS lookups (fastest mode; requires Sniffing to be enabled).
-    IPIfNonMatch — If a domain does not match any domain-based rule, Xray resolves it via its dns module and checks the resulting IP against IP-based rules (geoip:...). Best balance between speed and accuracy.
-    IPOnDemand — Always resolves the domain to an IP before evaluating rules. Introduces extra latency on every new connection.
+```json
+{
+  "dns": {
+    "servers": [
+      {
+        "address": "https+local://1.1.1.1/dns-query",
+        "domains": [
+          "geosite:google",
+          "geosite:openai",
+          "geosite:netflix"
+        ]
+      },
+      "https+local://8.8.8.8/dns-query"
+    ],
+    "queryStrategy": "UseIPv4"
+  },
+  "routing": {
+    "domainStrategy": "IPIfNonMatch",
+    "rules": [
+      {
+        "type": "field",
+        "domain": [
+          "geosite:category-ads-all"
+        ],
+        "outboundTag": "block"
+      },
+      {
+        "type": "field",
+        "domain": [
+          "geosite:google",
+          "geosite:openai",
+          "geosite:netflix"
+        ],
+        "outboundTag": "warp"
+      },
+      {
+        "type": "field",
+        "ip": [
+          "geoip:private"
+        ],
+        "outboundTag": "block"
+      }
+    ]
+  }
+}
+```
+## How domainStrategy Works in Routing
+1. **`AsIs`** — Inspects only the domain name sent by the client without performing additional DNS lookups (fastest mode; requires Sniffing to be enabled).
+2. **`IPIfNonMatch`** — If a domain does not match any domain-based rule, Xray resolves it via its dns module and checks the resulting IP against IP-based rules (geoip:...). **Best balance between speed and accuracy.**.
+3. **`IPOnDemand`** — Always resolves the domain to an IP before evaluating rules. Introduces extra latency on every new connection.
 
 5. Specifics for Cascade Setups (RU Bridge → Foreign VPS)
 When using an intermediate relay server in Russia (Bridge / Relay), follow these strict rules:
