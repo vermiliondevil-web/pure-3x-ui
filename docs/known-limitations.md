@@ -2,7 +2,7 @@
 
 Этот документ перечисляет ограничения, которые унаследованы от upstream или являются следствием архитектуры форка. Прочитайте его перед обновлением или изменением настроек.
 
-# `install.sh` не сохраняет ядро Xray
+## `install.sh` не сохраняет ядро Xray
 
 Если вы **переустанавливаете** панель через `install.sh` на **живой** системе — ядро Xray сбросится на версию из архива. Для **обновления** используйте:
 
@@ -11,14 +11,14 @@
 
 Эти способы **сохраняют** выбранное ядро (патч `[8/8]` в `update.sh`).
 
-# Sandbox в systemd
+## Sandbox в systemd
 
 С `v3.10.0` панель запускается в sandbox: `/usr, /boot, /etc, /home, /root` — read-only, кроме папок панели (`/etc/x-ui`, `/usr/local/x-ui`, `/var/log/x-ui`).
 
 Если вы **изменили** пути панели (`XUI_DB_FOLDER`, `XUI_LOG_FOLDER`), sandbox может **блокировать** запись. Решение — свой drop-in:
 
 ```bash
-# /etc/systemd/system/x-ui.service.d/20-local.conf
+## /etc/systemd/system/x-ui.service.d/20-local.conf
 [Service]
 ReadWritePaths=/ваш/путь
 ```
