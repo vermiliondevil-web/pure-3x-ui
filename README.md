@@ -7,7 +7,7 @@
 
 ## [Как это работает](docs/how-it-works.md)
 ## [Известные ограничения](docs/known-limitations.md)
-
+## [Безопасность](docs/security.md)
 > **Это форк.** Проект является производной работой от [3x-ui](https://github.com/MHSanaei/3x-ui) (автор — [MHSanaei](https://github.com/MHSanaei)) и распространяется под лицензией **AGPL-3.0**. Все изменения, внесённые в этот форк, публикуются под той же лицензией.
 
 Чистая сборка [3x-ui](https://github.com/MHSanaei/3x-ui) без рекламы и донат-блоков.
