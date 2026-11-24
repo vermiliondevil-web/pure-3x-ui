@@ -329,16 +329,27 @@ Under Xray Settings → DNS (or in the raw JSON configuration), the following re
 
 3. Baseline Secure DNS Configuration (for a Foreign VPS)
 On a foreign server, there is no need to split queries by country — all external domains should be resolved via encrypted DoH servers with automatic failover.
-json { "dns": { "servers": [ "https+local://1.1.1.1/dns-query", "https+local://8.8.8.8/dns-query" ], "queryStrategy": "UseIPv4", "disableCache": false, "disableFallback": false } }
-Explanation of Key Parameters
+```json
+{
+  "dns": {
+    "servers": [
+      "https+local://1.1.1.1/dns-query",
+      "https+local://8.8.8.8/dns-query"
+    ],
+    "queryStrategy": "UseIPv4",
+    "disableCache": false,
+    "disableFallback": false
+  }
+}
+```
+##Explanation of Key Parameters
 
-    https+local://1.1.1.1/dns-query — Primary Cloudflare DoH resolver. The +local prefix ensures Xray sends queries directly through the server's network interface (freedom), preventing routing loops.
-
-https+local://8.8.8.8/dns-query — Backup Google DoH resolver used automatically if the primary server becomes temporarily unreachable.
-queryStrategy: "UseIPv4" — Forces Xray to query only IPv4 addresses (A records). Solves website hangs on VPS instances with misconfigured IPv6 or where the datacenter's IPv6 subnet is blocked by target services.
-disableCache: false — Enables in-memory DNS response caching in Xray to speed up repeated lookups.
-disableFallback: false — Allows automatic fallback to the backup DNS server in the servers list if the primary resolver fails or times out. When set to true, fallback servers are never queried.
-
+##https+local://1.1.1.1/dns-query — Primary Cloudflare DoH resolver. The +local prefix ensures Xray sends queries directly through the server's network interface (freedom), preventing routing loops.
+##https+local://8.8.8.8/dns-query — Backup Google DoH resolver used automatically if the primary server becomes temporarily unreachable.
+##queryStrategy: "UseIPv4" — Forces Xray to query only IPv4 addresses (A records). Solves website hangs on VPS instances with misconfigured IPv6 or where the datacenter's IPv6 subnet is blocked by target services.
+##disableCache: false — Enables in-memory DNS response caching in Xray to speed up repeated lookups.
+##disableFallback: false — Allows automatic fallback to the backup DNS server in the servers list if the primary resolver fails or times out. When set to true, fallback servers are never queried.
+   
 4. DNS Routing When Using Cloudflare WARP
 If your server uses a warp outbound gateway (to bypass Google CAPTCHAs, access ChatGPT, etc.), DNS queries for those services must also resolve properly without causing Cloudflare's own endpoint domain to loop.
 Example dns + routing Configuration for WARP
