@@ -6,7 +6,7 @@
 [![License](https://img.shields.io/github/license/vermiliondevil-web/pure-3x-ui)](LICENSE)
 
 ## [How It Works](docs/how-it-works.en.md)
-## [Known Limitations]
+## [Known Limitations](docs/known-limitations.en.md)
 ## [Security]
 ## [Regional Hosting Provider Lockouts]
 ## [Thoughts on the Original Project]
