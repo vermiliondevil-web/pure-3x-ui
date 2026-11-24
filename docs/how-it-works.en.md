@@ -182,8 +182,22 @@ Bottom Line: The ISP has zero technical indicators (signatures) to distinguish a
 
 In this architecture, Reality + XHTTP handles secure ingress to your VPS (protecting against ISP DPI), while Cloudflare WARP acts as an outbound gateway on the server itself, masking your hosting provider's IP address from destination websites.
 1. Traffic Flow Diagram (Routing)
-text ┌──────────────┐ 1. XHTTP + Reality ┌───────────────────────────┐ 2. WireGuard (WARP) ┌────────────────┐ │ Client │ ─────────────────────────────> │ Your Server (VPS) │ ──────────────────────────────> │ Cloudflare │ │ (v2rayN etc.)│ (Masqueraded as HTTPS site) │ │ (Tunnel from VPS to CF) │ WARP Network │ └──────────────┘ │ ┌─────────────────────┐ │ └───────┬────────┘ │ │ Xray-core │ │ │ │ │ 1. Decrypts │ │ │ 3. Egress to web │ │ Reality/XHTTP │ │ │ with a clean IP │ │ 2. Routes traffic │ │ ▼ │ │ to WARP Outbound│ │ ┌────────────────┐ │ └─────────────────────┘ │ │ Target Website │ └───────────────────────────┘ │ (Google, ChatGPT│ │ & other sites)│ └────────────────┘
-2. Packet Transformation Datagram (Step by Step)
+```text
+┌──────────────┐       1. XHTTP + Reality       ┌───────────────────────────┐       2. WireGuard (WARP)       ┌────────────────┐
+│    Client    │ ─────────────────────────────> │       Your Server (VPS)   │ ──────────────────────────────> │   Cloudflare   │
+│ (v2rayN etc.)│   (Masqueraded as HTTPS site)  │                           │   (Tunnel from VPS to CF)       │  WARP Network  │
+└──────────────┘                                │  ┌─────────────────────┐  │                                 └───────┬────────┘
+                                                │  │      Xray-core      │  │                                         │
+                                                │  │  1. Decrypts        │  │                                         │ 3. Egress to web
+                                                │  │     Reality/XHTTP   │  │                                         │    with a clean IP
+                                                │  │  2. Routes traffic  │  │                                         ▼
+                                                │  │     to WARP Outbound│  │                                 ┌────────────────┐
+                                                │  └─────────────────────┘  │                                 │ Target Website │
+                                                └───────────────────────────┘                                 │ (Google, ChatGPT│
+                                                                                                              │  & other sites)│
+                                                                                                              └────────────────┘
+```
+3. Packet Transformation Datagram (Step by Step)
 The packet changes its "wrapping" twice: upon entering the VPS (where ISP protection is stripped away) and upon exiting the VPS (where the Cloudflare WARP tunnel is applied).
 ```text
 STAGE 1: From Client to Your VPS (Visible to your ISP / DPI)
@@ -192,19 +206,20 @@ STAGE 1: From Client to Your VPS (Visible to your ISP / DPI)
 | Your VPS IP | Port 443 (HTTPS) | SNI: decoy site | [HTTP/2 XHTTP] -> [VLESS + Data] |
 +-------------------+-------------------+-------------------+-----------------------------------+
 ▲
-└── ISP sees only a visit to a normal HTTPS website.
-Your actual request is encrypted inside.
+└── ISP sees only a visit to a normal HTTPS website. Your actual request is encrypted inside.
+```
 STAGE 2: Inside Your VPS (Xray-core routes the data)
 [ Decrypted User Request ] ──> Routing Rule (e.g., for Google / OpenAI / all traffic)
 └── Forwarded to Outbound: warp (WireGuard / MASQUE)
 STAGE 3: From Your VPS to Cloudflare Network (Visible to your VPS hoster)
+```text
 +-------------------+-------------------+-------------------+-----------------------------------+
 | IPv4 / IPv6 | UDP Header | WARP / WireGuard | Encrypted Payload |
 | Cloudflare IP | Port 2408 (UDP) | Tunnel header | [Your request to target site] |
 +-------------------+-------------------+-------------------+-----------------------------------+
 ▲
-└── Foreign VPS providers do not block WireGuard,
-so WARP runs at full speed.
+└── Foreign VPS providers do not block WireGuard, so WARP runs at full speed.
+```
 STAGE 4: From Cloudflare to Target Website (Visible to the website itself)
 +-------------------+-------------------+-------------------+-----------------------------------+
 | IPv4 / IPv6 | TCP Header | TLS 1.3 Header | Request to Website |
@@ -213,7 +228,7 @@ STAGE 4: From Cloudflare to Target Website (Visible to the website itself)
 ```
 Why Use This Setup?
 
-    Bypassing ISP DPI (XHTTP + Reality). Using standard WARP directly from a phone or PC in Russia is frequently blocked via WireGuard signatures. In this setup, WARP runs on a foreign VPS where no blocks exist, while your connection to the VPS uses censorship-resistant XHTTP + Reality.
+Bypassing ISP DPI (XHTTP + Reality). Using standard WARP directly from a phone or PC in Russia is frequently blocked via WireGuard signatures. In this setup, WARP runs on a foreign VPS where no blocks exist, while your connection to the VPS uses censorship-resistant XHTTP + Reality.
 
 Avoiding CAPTCHAs and IP Bans (WARP Outbound). Many websites (Google, ChatGPT, Netflix, banking portals) block datacenter (VPS) IP addresses or bombard them with CAPTCHAs. Routing egress traffic through WARP provides a trusted Cloudflare IP address.
 Flexible Routing. Inside the 3x-ui panel, you can route either all traffic through WARP or only specific domains (geosite:google, geosite:openai, etc.), letting the rest go directly through your VPS.
