@@ -424,43 +424,68 @@ When using an intermediate relay server in Russia (Bridge / Relay), strict rules
   * Check whether the **Sniffing** checkbox is enabled in your Inbound settings in the 3x-ui panel.
 
 
-🛡️ Technical Documentation: DNS Leak Prevention
-A DNS Leak occurs when your device sends domain name resolution requests (such as google.com) directly to your ISP's DNS servers outside the encrypted VPN tunnel. As a result, your ISP can log your browsing history and spoof responses with block page IPs.
-To achieve complete DNS isolation, configuration must be applied at two levels: on the server (3x-ui) and on the client device.
-1. Server-Side DNS Interception Diagram
-text ┌────────────────┐ 1. Client Request ┌──────────────────────────────────────────┐ │ Client (v2rayN │ ───────────────────────> │ Inbound (3x-ui) │ │ / Nekobox/TUN) │ (Including packets to │ Sniffing: ON (http, tls, quic, fakedns) │ └────────────────┘ port 53 UDP/TCP) └────────────────────┬─────────────────────┘ │ ▼ ┌────────────────┐ 3. Outbound DoH Query ┌──────────────────────────────────────────┐ │ Built-in │ <─────────────────────── │ Routing Rule (port: 53) │ │ Xray DNS │ ───────────────────────> │ Intercepts all port 53 traffic & sends │ │ (https+local) │ (Encrypted HTTPS) │ it to a dedicated "dns-out" Outbound │ └────────────────┘ └──────────────────────────────────────────┘
-Reference Xray Configuration Against DNS Leaks (by 3x-ui Tab)
-In the 3x-ui panel (Xray Settings → Advanced Configuration), settings are organized into tabs. Below is a table of ready-to-use JSON snippets for each tab.
-Tab in 3x-ui	Ready-to-Use JSON Block	Purpose & Leak Protection
-DNS (dns)	json<br>{<br> "servers": [<br> "https+local://1.1.1.1/dns-query",<br> "https+local://8.8.8.8/dns-query"<br> ],<br> "queryStrategy": "UseIPv4",<br> "disableCache": false,<br> "disableFallback": false<br>}<br>	Encryption & disabling system DNS. Prevents Xray from querying the host's /etc/resolv.conf (localhost). All requests go strictly over HTTPS (DoH) directly via the server's network interface without routing loops.
-Outbounds (outbounds)	json<br>[<br> {<br> "tag": "direct",<br> "protocol": "freedom"<br> },<br> {<br> "tag": "block",<br> "protocol": "blackhole"<br> },<br> {<br> "tag": "dns-out",<br> "protocol": "dns"<br> }<br>]<br>	Internal DNS handler. The dns protocol outbound tagged dns-out captures intercepted DNS packets from clients and forwards them to the built-in encrypted dns module configured above.
-Routing (routing)	json<br>{<br> "domainStrategy": "IPIfNonMatch",<br> "rules": [<br> {<br> "type": "field",<br> "port": "53",<br> "network": "tcp,udp",<br> "outboundTag": "dns-out"<br> },<br> {<br> "type": "field",<br> "ip": [<br> "geoip:private"<br> ],<br> "outboundTag": "block"<br> }<br> ]<br>}<br>	Forced port 53 interception. Any plaintext DNS query (UDP or TCP on port 53) entering the tunnel from a client is routed to dns-out. Private IP ranges (geoip:private) are blocked to prevent leaks and conflicts.
-Inbound (inbound)	json<br>"sniffing": {<br> "enabled": true,<br> "destOverride": [<br> "http",<br> "tls",<br> "quic",<br> "fakedns"<br> ]<br>}<br>	Domain name recovery. Allows Xray to extract the actual target domain from the SNI header or FakeDNS pool, even if the client device connected to the server using a raw IP address.
-2. Client-Side Configuration (v2rayN, Nekobox, Happ, v2rayNG)
-Even a flawless server configuration will not prevent leaks if your operating system (Windows, Android, iOS) sends DNS queries around the VPN client.
-Required Client Settings
+# 🛡️ Technical Documentation: DNS Leak Prevention
 
-    Use TUN Mode (VPN Mode) instead of System Proxy. A system HTTP/SOCKS proxy only intercepts browser traffic, leaving OS background services and games free to query your ISP's DNS servers directly. Always enable TUN mode (virtual network interface) on desktop and mobile devices.
+A **DNS Leak** occurs when a device sends domain name resolution requests (such as `google.com`) directly through your internet service provider's DNS servers, bypassing the encrypted VPN tunnel. As a result, the ISP can see your browsing history and spoof the response with a block page IP address.
 
-3. Browser and OS-Level Protection (Hidden Leak Channels)
-Modern browsers and operating systems often bypass VPN settings in the name of "speed" or "security":
-Leak Source	What the Problem Is	How to Fix It
-In-Browser DoH (Chrome, Edge, Firefox, Yandex)	The browser sends its own DNS-over-HTTPS queries directly to your ISP or Yandex servers, ignoring system DNS settings.	Disable "Use secure DNS" in your browser settings (or ensure TUN mode is active so all browser traffic is forced through the tunnel).
-IPv6 on the Client Device	If your ISP provides IPv6 connectivity while your VPN tunnel only handles IPv4, DNS queries may leak over IPv6 outside the tunnel.	Enable IPv6 support inside your client's TUN settings, or disable IPv6 in your PC's network adapter properties.
-Smart Multi-Homed Name Resolution (Windows)	Windows 10/11 broadcasts DNS queries simultaneously across all network adapters (including your ISP's Wi-Fi) and accepts the fastest reply (often a TSPU block page).	Use TUN mode with a high interface metric priority (clients like v2rayN and Nekoray configure this automatically when TUN is enabled).
-Browser WebRTC	Video-calling APIs can expose your real local or public ISP IP address outside the proxy tunnel.	Install the WebRTC Leak Prevent extension or disable WebRTC in your browser settings.
-4. How to Verify There Are No DNS Leaks
+For complete DNS isolation, configuration must be performed at two levels: **on the server (3x-ui)** and **on the client device**.
 
-    Connect to your server via your VPN client.
+---
 
-Open an incognito/private browser window and visit any DNS leak testing service:
+## 1. Server-Side DNS Interception Diagram
 
-    ipleak.net
-    dnsleaktest.com (select Extended Test)
-    browserleaks.com
+```text
+┌────────────────┐    1. Client Request     ┌──────────────────────────────────────────┐
+│ Client (v2rayN │ ───────────────────────> │            Inbound (3x-ui)               │
+│ / Nekobox/TUN) │   (Including packets to  │  Sniffing: ON (http, tls, quic, fakedns) │
+└────────────────┘    port 53 UDP/TCP)      └────────────────────┬─────────────────────┘
+                                                                 │
+                                                                 ▼
+┌────────────────┐    3. Outbound DoH Query ┌──────────────────────────────────────────┐
+│   Built-in     │ <─────────────────────── │       Routing Rule (port: 53)            │
+│   Xray DNS     │ ───────────────────────> │  Intercepts all port 53 traffic & sends  │
+│ (https+local)  │   (Encrypted HTTPS)      │  it to a dedicated "dns-out" Outbound    │
+└────────────────┘                          └──────────────────────────────────────────┘
+```
 
-Criteria for a successful setup:
+### Reference Xray Configuration Against DNS Leaks (by Section for 3x-ui)
 
-    The list of detected DNS servers shows only Cloudflare / Google IP addresses located in the country of your foreign VPS.
-    There are no IP addresses or names belonging to your Russian ISP.
-    Restricted websites load immediately without block pages or delays.
+In the **3x-ui** panel (**Xray Settings → Advanced Configuration**), settings are divided into tabs. Below is a table with ready-to-use JSON blocks for each tab.
+
+| Tab in 3x-ui | Ready-to-Use JSON Block | Purpose and Leak Protection |
+| :--- | :--- | :--- |
+| **DNS** (`dns`) | ```json<br>{<br>  "servers": [<br>    "https+local://1.1.1.1/dns-query",<br>    "https+local://8.8.8.8/dns-query"<br>  ],<br>  "queryStrategy": "UseIPv4",<br>  "disableCache": false,<br>  "disableFallback": false<br>}<br>``` | **Encryption and disabling system DNS.** Prohibits querying the hosting provider's `/etc/resolv.conf` (`localhost`). All requests go strictly over HTTPS (`DoH`) directly via the server's network interface without routing loops. |
+| **Outbounds** (`outbounds`) | ```json<br>[<br>  {<br>    "tag": "direct",<br>    "protocol": "freedom"<br>  },<br>  {<br>    "tag": "block",<br>    "protocol": "blackhole"<br>  },<br>  {<br>    "tag": "dns-out",<br>    "protocol": "dns"<br>  }<br>]<br>``` | **Creating an internal DNS handler.** The `dns` protocol with the `dns-out` tag accepts intercepted DNS packets from clients and forwards them to the built-in secure `dns` module (configured above). |
+| **Routing** (`routing`) | ```json<br>{<br>  "domainStrategy": "IPIfNonMatch",<br>  "rules": [<br>    {<br>      "type": "field",<br>      "port": "53",<br>      "network": "tcp,udp",<br>      "outboundTag": "dns-out"<br>    },<br>    {<br>      "type": "field",<br>      "ip": [<br>        "geoip:private"<br>      ],<br>      "outboundTag": "block"<br>    }<br>  ]<br>}<br>``` | **Forced port 53 interception.** Any plaintext DNS request (UDP or TCP on port 53) entering the tunnel from a client is routed to `dns-out`. Local subnets (`geoip:private`) are blocked to prevent leaks and conflicts. |
+| **Inbound** (`inbound`) | ```json<br>"sniffing": {<br>  "enabled": true,<br>  "destOverride": [<br>    "http",<br>    "tls",<br>    "quic",<br>    "fakedns"<br>  ]<br>}<br>``` | **Domain name recovery.** Allows Xray to read the real domain from the SNI header or FakeDNS pool, even if the client device connected to the server directly via an IP address. |
+
+## 2. Client-Side Configuration (v2rayN, Nekobox, Happ, v2rayNG)
+
+Even a flawless server configuration will not help if the operating system itself (Windows, Android, iOS) sends DNS queries **bypassing** the VPN client.
+
+### Mandatory Client Settings
+
+* **TUN Mode (VPN Mode) instead of a simple system proxy.** A system HTTP/SOCKS proxy only intercepts browser traffic, while OS background services and games continue contacting your ISP's DNS directly. Always use **TUN** mode (virtual network interface) on PC and smartphones.
+
+## 3. Browser and OS-Level Protection (Hidden Leak Channels)
+
+Modern browsers and operating systems often bypass VPN settings for the sake of "speed" and "security":
+
+| Leak Source | What the Problem Is | How to Fix It |
+| :--- | :--- | :--- |
+| **In-browser DoH** (Chrome, Edge, Firefox, Yandex) | The browser sends its own DNS request over HTTPS directly to the ISP's or Yandex's server, ignoring the system DNS. | Disable **"Use secure DNS"** in your browser settings (or ensure **TUN** mode is running, which routes all browser traffic into the tunnel). |
+| **IPv6 on the client device** | If your ISP provides IPv6 while the VPN tunnel is configured only for IPv4, DNS requests may leak over IPv6 outside the tunnel. | Enable IPv6 support in your client's TUN mode, or disable IPv6 in your PC's network adapter properties. |
+| **Smart Multi-Homed Name Resolution (Windows)** | Windows 10/11 sends DNS queries in parallel across all network adapters (including your ISP's Wi-Fi) and accepts the fastest response (the TSPU block page). | Use **TUN** mode with a high interface metric priority (clients like `v2rayN` / `Nekoray` do this automatically when TUN is enabled). |
+| **WebRTC in the browser** | Video-calling technology can expose your real local or public ISP IP address bypassing the proxy. | Install the **WebRTC Leak Prevent** extension or disable WebRTC in your browser settings. |
+
+## 4. How to Verify There Are No DNS Leaks
+
+1. Connect to your server through your client.
+2. Open any leak testing service in incognito mode:
+   * `ipleak.net`
+   * `dnsleaktest.com` (select **Extended Test**)
+   * `browserleaks.com`
+3. **Criteria for a successful setup:**
+   * The list of detected DNS servers shows **only Cloudflare / Google IP addresses** in the country where your foreign VPS is located.
+   * There are **no** IP addresses or names belonging to your Russian ISP in the list.
+   * Blocked resources open without block pages or delays.
