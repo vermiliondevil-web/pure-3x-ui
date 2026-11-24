@@ -5,7 +5,7 @@
 [![Release](https://img.shields.io/github/v/release/vermiliondevil-web/pure-3x-ui?label=release)](https://github.com/vermiliondevil-web/pure-3x-ui/releases/latest)
 [![License](https://img.shields.io/github/license/vermiliondevil-web/pure-3x-ui)](LICENSE)
 
-## [How It Works]
+## [How It Works](docs/how-it-works.en.md)
 ## [Known Limitations]
 ## [Security]
 ## [Regional Hosting Provider Lockouts]
