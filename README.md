@@ -9,6 +9,13 @@
 ## [Известные ограничения](docs/known-limitations.md)
 ## [Безопасность](docs/security.md)
 ## [Региональные блокировки хостеров](docs/Regional-lockout.md)
+
+### Текущее состояние синхронизации и сборки
+
+- **Форк:** [Releases](https://github.com/vermiliondevil-web/pure-3x-ui/releases/latest)
+- **Upstream:** [Releases](https://github.com/MHSanaei/3x-ui/releases)
+- **История sync:** [docs/upstream-changelog.md](docs/upstream-changelog.md)
+
 > **Это форк.** Проект является производной работой от [3x-ui](https://github.com/MHSanaei/3x-ui) (автор — [MHSanaei](https://github.com/MHSanaei)) и распространяется под лицензией **AGPL-3.0**. Все изменения, внесённые в этот форк, публикуются под той же лицензией.
 
 Чистая сборка [3x-ui](https://github.com/MHSanaei/3x-ui) без рекламы и донат-блоков.
@@ -76,11 +83,6 @@ upstream злонамерен. Мы утверждаем, что **процес�
 
 Нишевые фиксы (multi-user Shadowsocks, node sync, MTProto, vmess import) — **пропускаются**, если не используются.
 
-### Текущее состояние
-
-- **Форк:** [Releases](https://github.com/vermiliondevil-web/pure-3x-ui/releases/latest)
-- **Upstream:** [Releases](https://github.com/MHSanaei/3x-ui/releases)
-- **История sync:** [docs/upstream-changelog.md](docs/upstream-changelog.md)
 
 
 ## Политика в отношении спонсорских коммитов
