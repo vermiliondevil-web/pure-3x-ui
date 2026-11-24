@@ -405,26 +405,24 @@ Example dns + routing Configuration for WARP
 2. **`IPIfNonMatch`** — If a domain does not match any domain-based rule, Xray resolves it via its dns module and checks the resulting IP against IP-based rules (geoip:...). **Best balance between speed and accuracy.**.
 3. **`IPOnDemand`** — Always resolves the domain to an IP before evaluating rules. Introduces extra latency on every new connection.
 
-## 5. Specifics for Cascade Setups (RU Bridge → Foreign VPS)
-When using an intermediate relay server in Russia (Bridge / Relay), follow these strict rules:
+## 5. Specifics of Cascade Configuration (RU Bridge → Foreign VPS)
 
-    Do not configure (or use) the dns module on the Russian VPS. Incoming traffic (VLESS + XHTTP + Reality or Dokodemo-door) must be forwarded to the outbound tunnel toward the foreign server as-is (byte-for-byte) without attempting to decrypt TLS or resolve domains inside Russia.
-    All DNS resolution happens exclusively on the foreign VPS. Only the final exit server outside TSPU's reach may issue DoH requests and connect to target websites.
-    On the client side (v2rayN / Nekobox / Happ). Ensure Remote DNS (or FakeDNS) routing is enabled so the client device never sends plaintext UDP queries to your ISP's port 53 outside the tunnel.
+When using an intermediate relay server in Russia (Bridge / Relay), strict rules apply:
 
-6. DNS Troubleshooting Checklist
+1. **On the Russian VPS, the `dns` module is not configured (or not used).** Incoming traffic (`VLESS + XHTTP + Reality` or `Dokodemo-door`) must be forwarded into the outbound tunnel to the foreign server **as-is (byte-for-byte)** without attempting to decrypt TLS or resolve the domain inside Russia.
+2. **All DNS processing is performed exclusively on the foreign VPS.** Only the final server outside the reach of TSPU is allowed to send DoH requests and establish connections with target websites.
+3. **On the client side (v2rayN / Nekobox / Happ).** **Remote DNS** (or **FakeDNS**) routing must be enabled so that the client device does not send unencrypted UDP requests to the ISP's port 53 bypassing the tunnel.
 
-    ISP block page opens even with VPN enabled:
-        Check client settings: verify that FakeDNS or proxy DNS routing (Remote DNS) is active.
-        Ensure your browser's built-in "Secure DNS" is either disabled or routed through the VPN tunnel rather than over your local ISP.
+## 6. DNS Troubleshooting Checklist
 
-Websites take 3–5 seconds to load (IPv6 timeout):
+* **ISP block page opens while VPN is enabled:**
+  * Check your client settings: verify whether `FakeDNS` or DNS routing over proxy (`Remote DNS`) is enabled.
+  * Make sure the browser's built-in "Secure DNS" over your local ISP is disabled, or that it is routed through the tunnel.
+* **Websites open with a 3–5 second delay (IPv6 timeout):**
+  * Set `"queryStrategy": "UseIPv4"` in the `dns` section of your Xray config in 3x-ui.
+* **Routing rules (`geosite` / ad blocking) do not trigger:**
+  * Check whether the **Sniffing** checkbox is enabled in your Inbound settings in the 3x-ui panel.
 
-    Set "queryStrategy": "UseIPv4" in the dns section of your Xray configuration in 3x-ui.
-
-Routing rules (geosite / ad-blocking) are not triggering:
-
-    Verify that Sniffing is enabled in your Inbound settings inside the 3x-ui panel.
 
 🛡️ Technical Documentation: DNS Leak Prevention
 A DNS Leak occurs when your device sends domain name resolution requests (such as google.com) directly to your ISP's DNS servers outside the encrypted VPN tunnel. As a result, your ISP can log your browsing history and spoof responses with block page IPs.
