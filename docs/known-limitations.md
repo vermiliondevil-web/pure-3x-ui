@@ -22,7 +22,7 @@
 [Service]
 ReadWritePaths=/ваш/путь
 ```
-```markdown
+
 ⚠️ Не используйте dev-latest / pre-release сборки
 
     [!CAUTION]
