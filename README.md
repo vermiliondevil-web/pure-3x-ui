@@ -1,4 +1,6 @@
-# pure-3x-ui [English version](README.en.md)
+# pure-3x-ui
+[English version](README.en.md)
+[как это работает](how-it-works.md)
 
 [![Build and Release](https://github.com/vermiliondevil-web/pure-3x-ui/actions/workflows/release.yml/badge.svg)](https://github.com/vermiliondevil-web/pure-3x-ui/actions/workflows/release.yml)
 [![Sync Upstream](https://github.com/vermiliondevil-web/pure-3x-ui/actions/workflows/sync-upstream.yml/badge.svg)](https://github.com/vermiliondevil-web/pure-3x-ui/actions/workflows/sync-upstream.yml)
