@@ -37,7 +37,7 @@ bash <(curl -Ls https://raw.githubusercontent.com/vermiliondevil-web/pure-3x-ui/
 bash <(curl -Ls "https://github.com/vermiliondevil-web/pure-3x-ui/raw/main/install.sh")
 
 # 2. С конкретным тегом (стабильный релиз)
-bash <(curl -Ls https://raw.githubusercontent.com/vermiliondevil-web/pure-3x-ui/v3.9.22/install.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/vermiliondevil-web/pure-3x-ui/v3.10.0/install.sh)
 ```
 ## Docker (альтернативный форк)
 
