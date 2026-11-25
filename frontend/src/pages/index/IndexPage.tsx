@@ -29,6 +29,7 @@ import ThroughputCard from './ThroughputCard';
 import ConnectionsCard from './ConnectionsCard';
 import SystemStrip from './SystemStrip';
 import { mean, peak, useOverviewHistory } from './useOverviewHistory';
+import type { OverviewRange } from './OverviewRangeSelect';
 import type { PanelUpdateInfo } from './PanelUpdateModal';
 const JsonEditor = lazy(() => import('@/components/form/JsonEditor'));
 const PanelUpdateModal = lazy(() => import('./PanelUpdateModal'));
@@ -40,6 +41,15 @@ const XrayLogModal = lazy(() => import('./XrayLogModal'));
 const AmneziaWGLogModal = lazy(() => import('./AmneziaWGLogModal'));
 const VersionModal = lazy(() => import('./VersionModal'));
 import './IndexPage.css';
+
+function metricFoot(label: string, value: string) {
+  return (
+    <>
+      <span>{label}</span>
+      <bdi>{value}</bdi>
+    </>
+  );
+}
 
 export default function IndexPage() {
   const { t } = useTranslation();
@@ -75,7 +85,8 @@ export default function IndexPage() {
   const [loading, setLoading] = useState(false);
   const [loadingTip, setLoadingTip] = useState(t('loading'));
 
-  const history = useOverviewHistory(status, fetched && !fetchError);
+  const [historyRange, setHistoryRange] = useState<OverviewRange>(2);
+  const history = useOverviewHistory(status, fetched && !fetchError, historyRange);
 
   useEffect(() => {
     HttpUtil.post<{ accessLogEnable?: boolean; devChannelEnable?: boolean }>(
@@ -235,10 +246,18 @@ export default function IndexPage() {
                           ? `${status.logicalPro} vCPU`
                           : `${CPUFormatter.cpuCoreFormat(status.cpuCores)} / ${status.logicalPro}T · ${CPUFormatter.cpuSpeedFormat(status.cpuSpeedMhz)}`
                       }
-                      footLeft={`${t('pages.index.avg')} ${mean(history.series.cpu).toFixed(0)}%`}
-                      footRight={`${t('pages.index.peak')} ${peak(history.series.cpu).toFixed(0)}%`}
+                      footLeft={metricFoot(
+                        t('pages.index.avg'),
+                        `${mean(history.series.cpu).toFixed(0)}%`,
+                      )}
+                      footRight={metricFoot(
+                        t('pages.index.peak'),
+                        `${peak(history.series.cpu).toFixed(0)}%`,
+                      )}
                       data={history.series.cpu}
                       isMobile={isMobile}
+                      range={historyRange}
+                      onRangeChange={setHistoryRange}
                     />
                     <VitalTile
                       icon={<DatabaseOutlined aria-hidden />}
@@ -246,10 +265,18 @@ export default function IndexPage() {
                       percent={status.mem.percent}
                       statusColor={status.mem.color}
                       detail={`${SizeFormatter.sizeFormat(status.mem.current)} / ${SizeFormatter.sizeFormat(status.mem.total)}`}
-                      footLeft={`${t('pages.index.avg')} ${mean(history.series.mem).toFixed(0)}%`}
-                      footRight={`${t('pages.index.peak')} ${peak(history.series.mem).toFixed(0)}%`}
+                      footLeft={metricFoot(
+                        t('pages.index.avg'),
+                        `${mean(history.series.mem).toFixed(0)}%`,
+                      )}
+                      footRight={metricFoot(
+                        t('pages.index.peak'),
+                        `${peak(history.series.mem).toFixed(0)}%`,
+                      )}
                       data={history.series.mem}
                       isMobile={isMobile}
+                      range={historyRange}
+                      onRangeChange={setHistoryRange}
                     />
                     <VitalTile
                       icon={<SwapOutlined aria-hidden />}
@@ -258,10 +285,18 @@ export default function IndexPage() {
                       percent={status.swap.percent}
                       statusColor={status.swap.color}
                       detail={`${SizeFormatter.sizeFormat(status.swap.current)} / ${SizeFormatter.sizeFormat(status.swap.total)}`}
-                      footLeft={`${t('pages.index.avg')} ${mean(history.series.swap).toFixed(1)}%`}
-                      footRight={`${t('pages.index.peak')} ${peak(history.series.swap).toFixed(0)}%`}
+                      footLeft={metricFoot(
+                        t('pages.index.avg'),
+                        `${mean(history.series.swap).toFixed(1)}%`,
+                      )}
+                      footRight={metricFoot(
+                        t('pages.index.peak'),
+                        `${peak(history.series.swap).toFixed(0)}%`,
+                      )}
                       data={history.series.swap}
                       isMobile={isMobile}
+                      range={historyRange}
+                      onRangeChange={setHistoryRange}
                     />
                     <VitalTile
                       icon={<HddOutlined aria-hidden />}
@@ -269,10 +304,18 @@ export default function IndexPage() {
                       percent={status.disk.percent}
                       statusColor={status.disk.color}
                       detail={`${SizeFormatter.sizeFormat(status.disk.current)} / ${SizeFormatter.sizeFormat(totalDisk)}`}
-                      footLeft={`${t('pages.index.free')} ${SizeFormatter.sizeFormat(freeDisk)}`}
-                      footRight={`${t('pages.index.avg')} ${mean(history.series.diskUsage).toFixed(1)}%`}
+                      footLeft={metricFoot(
+                        t('pages.index.free'),
+                        SizeFormatter.sizeFormat(freeDisk),
+                      )}
+                      footRight={metricFoot(
+                        t('pages.index.avg'),
+                        `${mean(history.series.diskUsage).toFixed(1)}%`,
+                      )}
                       data={history.series.diskUsage}
                       isMobile={isMobile}
+                      range={historyRange}
+                      onRangeChange={setHistoryRange}
                     />
                   </div>
 
@@ -283,6 +326,8 @@ export default function IndexPage() {
                       down={history.series.netDown}
                       labels={history.labels}
                       isMobile={isMobile}
+                      range={historyRange}
+                      onRangeChange={setHistoryRange}
                     />
                     <ConnectionsCard
                       status={status}
@@ -290,6 +335,8 @@ export default function IndexPage() {
                       udp={history.series.udpCount}
                       labels={history.labels}
                       isMobile={isMobile}
+                      range={historyRange}
+                      onRangeChange={setHistoryRange}
                     />
                   </div>
 
